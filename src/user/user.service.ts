@@ -6,7 +6,8 @@ import { UserDto } from "./user.dto"
 import { JwtService } from "@nestjs/jwt"
 import * as bcrypt from "bcryptjs"
 import { Role } from "src/schemas/role.schema"
-import { json } from "stream/consumers"
+import { Request, Response } from "express"
+import { userInfo } from "os"
 
 @Injectable()
 export class UserService {
@@ -16,34 +17,48 @@ export class UserService {
     private jwtService: JwtService
   ) {}
 
-  async create(userDto: UserDto): Promise<User> {
+  async create(userDto: UserDto, res: Response) {
     const password = userDto.password
     const salt = await bcrypt.genSalt()
-    const passwordHash = await bcrypt.hash(password, salt)
+    const hash = await bcrypt.hash(password, salt)
     const userRole = await this.roleModel.findOne({ value: "USER" })
 
     const user = new this.userModel({
       ...userDto,
-      passwordHash,
+      passwordHash: hash,
       roles: [userRole.value],
     })
 
     user.save()
 
-    return user
+    const token = this.jwtService.sign({
+      _id: user._id,
+      name: user.username,
+    })
+
+    const { passwordHash, ...userInfo } = user
+
+    console.log(user)
+
+    res.json({
+      token,
+      user,
+    })
   }
 
-  async login(userDto: UserDto): Promise<User> {
-    const password = userDto.password
-    const salt = await bcrypt.genSalt()
-    const passwordHash = await bcrypt.hash(password, salt)
-    const userRole = await this.roleModel.findOne({ value: "USER" })
+  async login(userDto: UserDto, req: Request, res: Response) {
+    const user = await this.userModel.findOne({ email: userDto.email })
 
-    const createdUser = new this.userModel({
-      ...userDto,
-      passwordHash,
-      roles: [userRole.value],
+    if (!user) {
+      res.status(404).json({
+        message: "Пользователь не найден.",
+      })
+    }
+
+    user.save()
+
+    res.json({
+      user,
     })
-    return createdUser.save()
   }
 }
