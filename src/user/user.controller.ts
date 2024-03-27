@@ -23,7 +23,7 @@ export class UserController {
   }
 
   @Post("login")
-  async login(@Body() dto: UserDto, @Req() req: Request, @Res() res: Response) {
-    return this.userService.login(dto, req, res)
+  async login(@Body() dto: UserDto, @Res() res: Response) {
+    return this.userService.login(dto, res)
   }
 }

@@ -38,15 +38,13 @@ export class UserService {
 
     const { passwordHash, ...userInfo } = user
 
-    console.log(user)
-
     res.json({
       token,
       user,
     })
   }
 
-  async login(userDto: UserDto, req: Request, res: Response) {
+  async login(userDto: UserDto, res: Response) {
     const user = await this.userModel.findOne({ email: userDto.email })
 
     if (!user) {
@@ -55,7 +53,18 @@ export class UserService {
       })
     }
 
-    user.save()
+    console.log({ ...user })
+
+    const isValidPass = await bcrypt.compare(
+      userDto.password,
+      user.passwordHash
+    )
+
+    if (!isValidPass) {
+      return res.status(400).json({
+        message: "Неверный логин или пароль",
+      })
+    }
 
     res.json({
       user,
