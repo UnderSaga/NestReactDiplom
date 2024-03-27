@@ -1,15 +1,15 @@
-import { Optional } from "@nestjs/common"
-import { IsUrl, Length } from "class-validator"
+import { Optional } from "@nestjs/common";
+import { Length } from "class-validator";
 
 export class PostDto {
   @Length(5)
-  header: string
+  header: string;
 
   @Length(5)
-  body: string
+  body: string;
 
-  tags: string[]
+  tags: string[];
 
   @Optional()
-  imageUrl: string
+  imageUrl: string;
 }

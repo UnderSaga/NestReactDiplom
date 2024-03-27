@@ -8,10 +8,7 @@ import { Response } from "express";
 
 @Injectable()
 export class PostService {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
-    @InjectModel(Post.name) private postModel: Model<Post>
-  ) {}
+  constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
 
   async create(postDto: PostDto, res: Response) {
     try {
