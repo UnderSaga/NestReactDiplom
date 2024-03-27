@@ -23,13 +23,12 @@ export class UserController {
   }
 
   @Post("login")
-  @UsePipes(new ValidationPipe())
   async login(@Body() dto: UserDto, @Res() res: Response) {
     return this.userService.login(dto, res)
   }
 
   @Get("me")
-  async getMe(@Body() dto: UserDto, @Req() req: Request, @Res() res: Response) {
-    return this.userService.getMe(dto, req, res)
+  async getMe(@Req() req: Request, @Res() res: Response) {
+    return this.userService.getMe(req, res)
   }
 }

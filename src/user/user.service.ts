@@ -87,17 +87,23 @@ export class UserService {
     }
   }
 
-  async getMe(userDto: UserDto, req: Request, res: Response) {
+  async getMe(req: Request, res: Response) {
     try {
       const token = (req.headers.authorization || "").replace(/Bearer\s?/, "")
-      const decoded = this.jwtService.verify(token)
-      const user = await this.userModel.findById(decoded._id)
+      const decoded = await this.jwtService.verify(token)
+      const user = await this.userModel.findOne({
+        _id: decoded._id,
+      })
 
       if (!user) {
         throw new UnauthorizedException()
       }
 
       res.json(user)
-    } catch (error) {}
+    } catch (error) {
+      res.status(500).json({
+        error: "Что-то пошло не так.",
+      })
+    }
   }
 }
