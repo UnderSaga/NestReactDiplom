@@ -25,6 +25,9 @@ export class Post {
 
   @Prop({ default: Date.now })
   createdAt: Date
+
+  @Prop({ default: Date.now })
+  updatedAt: Date
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post)
