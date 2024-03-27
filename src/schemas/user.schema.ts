@@ -11,8 +11,10 @@ export class User {
   @Prop({ required: true })
   email: string
 
-  passwordHash: string
+  @Prop({ required: true })
+  password: string
 
+  @Prop({ required: false })
   avatarUrl: string
 
   @Prop({ type: [{ type: String, ref: "Role" }] })

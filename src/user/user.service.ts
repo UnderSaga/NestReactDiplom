@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable, UnauthorizedException } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { User } from "src/schemas/user.schema"
 import { Model } from "mongoose"
@@ -7,7 +7,6 @@ import { JwtService } from "@nestjs/jwt"
 import * as bcrypt from "bcryptjs"
 import { Role } from "src/schemas/role.schema"
 import { Request, Response } from "express"
-import { userInfo } from "os"
 
 @Injectable()
 export class UserService {
@@ -18,56 +17,87 @@ export class UserService {
   ) {}
 
   async create(userDto: UserDto, res: Response) {
-    const password = userDto.password
-    const salt = await bcrypt.genSalt()
-    const hash = await bcrypt.hash(password, salt)
-    const userRole = await this.roleModel.findOne({ value: "USER" })
+    try {
+      const { username, email, password } = userDto
+      const candidate = await this.userModel.findOne({ email: email })
+      if (candidate) {
+        throw new Error()
+      }
+      const hash = await bcrypt.hash(password, 10)
+      const userRole = await this.roleModel.findOne({ value: "USER" })
 
-    const user = new this.userModel({
-      ...userDto,
-      passwordHash: hash,
-      roles: [userRole.value],
-    })
+      const user = new this.userModel({
+        email,
+        username,
+        password: hash,
+        roles: [userRole.value],
+      })
 
-    user.save()
+      user.save()
 
-    const token = this.jwtService.sign({
-      _id: user._id,
-      name: user.username,
-    })
+      const token = this.jwtService.sign({
+        _id: user._id,
+        name: user.username,
+      })
 
-    const { passwordHash, ...userInfo } = user
-
-    res.json({
-      token,
-      user,
-    })
+      res.json({ token })
+    } catch (error) {
+      res.status(500).json({
+        error: "Не удалось создать пользователя.",
+      })
+    }
   }
 
   async login(userDto: UserDto, res: Response) {
-    const user = await this.userModel.findOne({ email: userDto.email })
+    try {
+      const user = await this.userModel.findOne({ email: userDto.email })
 
-    if (!user) {
-      res.status(404).json({
-        message: "Пользователь не найден.",
+      if (!user) {
+        res.status(404).json({
+          message: "Пользователь не найден.",
+        })
+      }
+
+      const isValidPass = await bcrypt.compare(userDto.password, user.password)
+
+      if (!isValidPass) {
+        return res.status(400).json({
+          message: "Неверный логин или пароль",
+        })
+      }
+
+      const token = this.jwtService.sign({
+        _id: user._id,
+        name: user.username,
+      })
+
+      const { _id, username, email, roles } = user
+
+      res.json({
+        _id,
+        username,
+        email,
+        roles,
+        token,
+      })
+    } catch (error) {
+      res.status(500).json({
+        error: "Не удалось войти в учетную запись.",
       })
     }
+  }
 
-    console.log({ ...user })
+  async getMe(userDto: UserDto, req: Request, res: Response) {
+    try {
+      const token = (req.headers.authorization || "").replace(/Bearer\s?/, "")
+      const decoded = this.jwtService.verify(token)
+      const user = await this.userModel.findById(decoded._id)
 
-    const isValidPass = await bcrypt.compare(
-      userDto.password,
-      user.passwordHash
-    )
+      if (!user) {
+        throw new UnauthorizedException()
+      }
 
-    if (!isValidPass) {
-      return res.status(400).json({
-        message: "Неверный логин или пароль",
-      })
-    }
-
-    res.json({
-      user,
-    })
+      res.json(user)
+    } catch (error) {}
   }
 }
