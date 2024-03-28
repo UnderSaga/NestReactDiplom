@@ -31,6 +31,7 @@ export class CommentService {
       const newComment = new this.commentModel({
         comment,
         author: decoded._id,
+        changed: false,
       })
       await newComment.save()
 
@@ -65,6 +66,10 @@ export class CommentService {
       }
       const { comment } = dto
 
+      if (findComment.comment === comment) {
+        return findComment
+      }
+
       await this.commentModel
         .findByIdAndUpdate(
           {
@@ -72,6 +77,7 @@ export class CommentService {
           },
           {
             comment: comment,
+            changed: true,
           }
         )
         .then((com) => {

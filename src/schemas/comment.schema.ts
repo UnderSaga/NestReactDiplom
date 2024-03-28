@@ -12,6 +12,10 @@ export class Comment {
   @Prop({ type: { type: String, ref: "User" } })
   author: string
 
+  @Prop({ required: true })
+  @Prop({ default: false })
+  changed: true
+
   @Prop({ default: Date.now })
   createdAt: Date
 }
