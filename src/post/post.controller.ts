@@ -48,4 +48,9 @@ export class PostController {
   async deletePost(@Param("id") id: string, @Res() res: Response) {
     return this.postService.deletePost(id, res)
   }
+
+  @Get("comments/:id")
+  async getComments(@Param("id") id: string, @Res() res: Response) {
+    return this.postService.getComments(id, res)
+  }
 }
