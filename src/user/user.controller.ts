@@ -3,14 +3,14 @@ import {
   Controller,
   Get,
   Post,
-  Req,
   Res,
   UsePipes,
   ValidationPipe,
+  Headers,
 } from "@nestjs/common"
 import { UserService } from "./user.service"
 import { UserDto } from "./user.dto"
-import { Request, Response } from "express"
+import { Response } from "express"
 
 @Controller("auth")
 export class UserController {
@@ -28,7 +28,16 @@ export class UserController {
   }
 
   @Get("me")
-  async getMe(@Req() req: Request, @Res() res: Response) {
-    return this.userService.getMe(req, res)
+  async getMe(@Headers("authorization") token: string, @Res() res: Response) {
+    return this.userService.getMe(token, res)
+  }
+
+  @Post("changeEmail")
+  async changeEmail(
+    @Headers("authorization") token: string,
+    @Res() res: Response,
+    @Body() dto: UserDto
+  ) {
+    return this.userService.changeEmail(token, res, dto)
   }
 }

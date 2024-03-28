@@ -67,7 +67,7 @@ export class CommentService {
       const { comment } = dto
 
       if (findComment.comment === comment) {
-        return findComment
+        return res.json(findComment)
       }
 
       await this.commentModel

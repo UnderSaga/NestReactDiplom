@@ -2,8 +2,6 @@ import {
   Controller,
   Post,
   Body,
-  Get,
-  Req,
   Res,
   UsePipes,
   ValidationPipe,
@@ -21,6 +19,7 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Post()
+  @UsePipes(new ValidationPipe())
   async createComment(
     @Headers("authorization") token: string,
     @Body() dto: CommentDto,

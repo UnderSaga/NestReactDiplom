@@ -90,10 +90,11 @@ export class UserService {
     }
   }
 
-  async getMe(req: Request, res: Response) {
+  async getMe(token: string, res: Response) {
     try {
-      const token = (req.headers.authorization || "").replace(/Bearer\s?/, "")
-      const decoded = await this.jwtService.verify(token)
+      const decoded = await this.jwtService.verify(
+        token.replace(/Bearer\s?/, "")
+      )
       const user = await this.userModel.findOne({
         _id: decoded._id,
       })
@@ -106,6 +107,38 @@ export class UserService {
     } catch (error) {
       res.status(500).json({
         error: "Не удалось получить данные пользователя.",
+      })
+    }
+  }
+
+  async changeEmail(token: string, res: Response, dto: UserDto) {
+    try {
+      const decoded = await this.jwtService.verify(
+        token.replace(/Bearer\s?/, "")
+      )
+      const user = await this.userModel.findOne({
+        _id: decoded._id,
+      })
+
+      if (!user) {
+        throw new UnauthorizedException()
+      }
+
+      await this.userModel.findOneAndUpdate(
+        {
+          _id: decoded._id,
+        },
+        {
+          email: dto.email,
+        }
+      )
+
+      res.json({
+        message: "Почта успешно изменена.",
+      })
+    } catch (error) {
+      res.status(500).json({
+        error: "Не удалось изменить почту.",
       })
     }
   }
