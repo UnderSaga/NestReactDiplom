@@ -5,16 +5,28 @@ import { Model } from "mongoose"
 import { PostDto } from "./post.dto"
 import { Post } from "src/schemas/post.schema"
 import { Response } from "express"
+import { JwtService } from "@nestjs/jwt"
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectModel(Post.name) private postModel: Model<Post>,
-    @InjectModel(Comment.name) private commentModel: Model<Comment>
+    @InjectModel(Comment.name) private commentModel: Model<Comment>,
+    private jwtService: JwtService
   ) {}
 
-  async create(postDto: PostDto, res: Response) {
+  async create(token: string, postDto: PostDto, res: Response) {
     try {
+      const decoded = await this.jwtService.verify(
+        token.replace(/Bearer\s?/, "")
+      )
+
+      if (decoded.role[0] != "ADMIN") {
+        return res.status(403).json({
+          message: "Недостаточно прав для создания статьи.",
+        })
+      }
+
       const doc = new this.postModel({
         header: postDto.header,
         body: postDto.body,
@@ -76,8 +88,18 @@ export class PostService {
     }
   }
 
-  async updatePost(dto: PostDto, id: string, res: Response) {
+  async updatePost(token: string, dto: PostDto, id: string, res: Response) {
     try {
+      const decoded = await this.jwtService.verify(
+        token.replace(/Bearer\s?/, "")
+      )
+
+      if (decoded.role[0] != "ADMIN") {
+        return res.status(403).json({
+          message: "Недостаточно прав для изменения статьи.",
+        })
+      }
+
       await this.postModel
         .findByIdAndUpdate(
           {
@@ -102,13 +124,22 @@ export class PostService {
     } catch (error) {
       res.status(500).json({
         message:
-          "Не удалось обновить статью. Возможно, статья с таким заголовком уже есть.",
+          "Не удалось обновить статью. Возможно, статья с таким заголовком уже существует.",
       })
     }
   }
 
-  async deletePost(id: string, res: Response) {
+  async deletePost(token: string, id: string, res: Response) {
     try {
+      const decoded = await this.jwtService.verify(
+        token.replace(/Bearer\s?/, "")
+      )
+
+      if (decoded.role[0] != "ADMIN") {
+        return res.status(403).json({
+          message: "Недостаточно прав для удаления статьи.",
+        })
+      }
       await this.postModel.findByIdAndDelete(id).then((doc) => {
         if (!doc) {
           throw new Error()

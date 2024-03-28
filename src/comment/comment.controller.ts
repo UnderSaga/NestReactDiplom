@@ -31,15 +31,20 @@ export class CommentController {
 
   @Patch(":id")
   async updateComment(
+    @Headers("authorization") token: string,
     @Param("id") id: string,
     @Body() dto: CommentDto,
     @Res() res: Response
   ) {
-    return this.commentService.update(id, dto, res)
+    return this.commentService.update(id, dto, res, token)
   }
 
   @Delete(":id")
-  async deleteComment(@Param("id") id: string, @Res() res: Response) {
-    return this.commentService.delete(id, res)
+  async deleteComment(
+    @Headers("authorization") token: string,
+    @Param("id") id: string,
+    @Res() res: Response
+  ) {
+    return this.commentService.delete(token, id, res)
   }
 }

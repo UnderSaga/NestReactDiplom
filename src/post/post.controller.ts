@@ -10,6 +10,7 @@ import {
   Param,
   Patch,
   Delete,
+  Headers,
 } from "@nestjs/common"
 import { PostService } from "./post.service"
 import { PostDto } from "./post.dto"
@@ -21,8 +22,12 @@ export class PostController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  async createPost(@Body() dto: PostDto, @Res() res: Response) {
-    return this.postService.create(dto, res)
+  async createPost(
+    @Headers("authorization") token: string,
+    @Body() dto: PostDto,
+    @Res() res: Response
+  ) {
+    return this.postService.create(token, dto, res)
   }
 
   @Get()
@@ -37,16 +42,21 @@ export class PostController {
 
   @Patch(":id")
   async updatePost(
+    @Headers("authorization") token: string,
     @Body() dto: PostDto,
     @Param("id") id: string,
     @Res() res: Response
   ) {
-    return this.postService.updatePost(dto, id, res)
+    return this.postService.updatePost(token, dto, id, res)
   }
 
   @Delete(":id")
-  async deletePost(@Param("id") id: string, @Res() res: Response) {
-    return this.postService.deletePost(id, res)
+  async deletePost(
+    @Headers("authorization") token: string,
+    @Param("id") id: string,
+    @Res() res: Response
+  ) {
+    return this.postService.deletePost(token, id, res)
   }
 
   @Get("comments/:id")

@@ -19,7 +19,7 @@ export class CommentService {
     try {
       const { postId, comment } = dto
       if (!comment) {
-        res.status(400).json({
+        return res.status(400).json({
           message: "Комментарий не может быть пустым.",
         })
       }
@@ -27,8 +27,8 @@ export class CommentService {
       const decoded = await this.jwtService.verify(
         token.replace(/Bearer\s?/, "")
       )
+
       const newComment = new this.commentModel({
-        postId,
         comment,
         author: decoded._id,
       })
@@ -50,9 +50,20 @@ export class CommentService {
     }
   }
 
-  async update(id: string, dto: CommentDto, res: Response) {
+  async update(id: string, dto: CommentDto, res: Response, token: string) {
     try {
-      const { comment, ...CommentDto } = dto
+      const decoded = await this.jwtService.verify(
+        token.replace(/Bearer\s?/, "")
+      )
+
+      const findComment = await this.commentModel.findById(id)
+
+      if (decoded.role[0] != "ADMIN" && decoded._id != findComment.author) {
+        return res.status(403).json({
+          message: "Недостаточно прав для изменения комментария.",
+        })
+      }
+      const { comment } = dto
 
       await this.commentModel
         .findByIdAndUpdate(
@@ -74,13 +85,23 @@ export class CommentService {
         })
     } catch (error) {
       res.status(500).json({
-        error,
+        error: "Не удалось обновить комментарий.",
       })
     }
   }
 
-  async delete(id: string, res: Response) {
+  async delete(token: string, id: string, res: Response) {
     try {
+      const decoded = await this.jwtService.verify(
+        token.replace(/Bearer\s?/, "")
+      )
+
+      const findComment = await this.commentModel.findById(id)
+      if (decoded.role[0] != "ADMIN" && decoded._id != findComment.author) {
+        return res.status(403).json({
+          message: "Недостаточно прав для изменения комментария.",
+        })
+      }
       await this.commentModel
         .findByIdAndDelete({
           _id: id,
@@ -96,7 +117,7 @@ export class CommentService {
         })
     } catch (error) {
       res.status(500).json({
-        error,
+        error: "Не удалось удалить комментарий.",
       })
     }
   }
