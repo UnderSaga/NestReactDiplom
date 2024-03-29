@@ -3,7 +3,6 @@ import {
   Post,
   Body,
   Get,
-  Req,
   Res,
   UsePipes,
   ValidationPipe,
@@ -14,7 +13,7 @@ import {
 } from "@nestjs/common"
 import { PostService } from "./post.service"
 import { PostDto } from "./post.dto"
-import { Request, Response } from "express"
+import { Response } from "express"
 
 @Controller("posts")
 export class PostController {

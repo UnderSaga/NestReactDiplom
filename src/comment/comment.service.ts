@@ -29,6 +29,7 @@ export class CommentService {
       )
 
       const newComment = new this.commentModel({
+        postId,
         comment,
         author: decoded._id,
         changed: false,
@@ -103,11 +104,30 @@ export class CommentService {
       )
 
       const findComment = await this.commentModel.findById(id)
+
       if (decoded.role[0] != "ADMIN" && decoded._id != findComment.author) {
         return res.status(403).json({
           message: "Недостаточно прав для изменения комментария.",
         })
       }
+
+      const comment = await this.commentModel.findById({
+        _id: id,
+      })
+
+      try {
+        await this.postModel.findByIdAndUpdate(
+          {
+            _id: comment.postId,
+          },
+          {
+            $pull: { comments: comment._id },
+          }
+        )
+      } catch (error) {
+        throw new Error()
+      }
+
       await this.commentModel
         .findByIdAndDelete({
           _id: id,
@@ -118,9 +138,9 @@ export class CommentService {
               message: "Комментарий не найден.",
             })
           }
-
-          res.json({ success: true })
         })
+
+      res.json({ success: true })
     } catch (error) {
       res.status(500).json({
         error: "Не удалось удалить комментарий.",

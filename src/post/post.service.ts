@@ -168,7 +168,11 @@ export class PostService {
 
       const list = await Promise.all(
         post.comments.map((comment) => {
-          return this.commentModel.findById(comment)
+          const item = this.commentModel.findById(comment)
+          if (!item) {
+            return false
+          }
+          return item
         })
       )
 

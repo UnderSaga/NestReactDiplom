@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
-import { HydratedDocument } from "mongoose"
+import mongoose, { HydratedDocument } from "mongoose"
 
 export type PostDocument = HydratedDocument<Post>
 
@@ -17,8 +17,8 @@ export class Post {
   @Prop({ required: false })
   imageUrl: string
 
-  @Prop({ type: [{ type: String, ref: "Comment" }] })
-  comments: string[]
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }] })
+  comments: mongoose.Schema.Types.ObjectId[]
 
   @Prop({ default: 0 })
   viewCount: number

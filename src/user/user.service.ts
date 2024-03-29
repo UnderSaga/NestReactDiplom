@@ -6,7 +6,7 @@ import { UserDto } from "./user.dto"
 import { JwtService } from "@nestjs/jwt"
 import * as bcrypt from "bcryptjs"
 import { Role } from "src/schemas/role.schema"
-import { Request, Response } from "express"
+import { Response } from "express"
 
 @Injectable()
 export class UserService {
@@ -55,7 +55,7 @@ export class UserService {
       const user = await this.userModel.findOne({ email: userDto.email })
 
       if (!user) {
-        res.status(404).json({
+        return res.status(404).json({
           message: "Пользователь не найден.",
         })
       }
