@@ -14,12 +14,31 @@ import {
 import { PostService } from "./post.service"
 import { PostDto } from "./post.dto"
 import { Response } from "express"
+import {
+  ApiAcceptedResponse,
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiTags,
+} from "@nestjs/swagger"
 
 @Controller("posts")
+@ApiTags("Post")
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post()
+  @ApiCreatedResponse({
+    description: "Статья успешно создана.",
+  })
+  @ApiForbiddenResponse({
+    description: "Недостаточно прав для выполнения этого действия.",
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Не удалось создать статью.",
+  })
   @UsePipes(new ValidationPipe())
   async createPost(
     @Headers("authorization") token: string,
@@ -30,16 +49,40 @@ export class PostController {
   }
 
   @Get()
+  @ApiCreatedResponse({
+    description: "Список статей успешно получен.",
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Не удалось получить список статей.",
+  })
   async getAll(@Res() res: Response) {
     return this.postService.getAll(res)
   }
 
   @Get(":id")
+  @ApiCreatedResponse({
+    description: "Статья успешно получена.",
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Не удалось получить статью.",
+  })
   async getOne(@Param("id") id: string, @Res() res: Response) {
     return this.postService.getOne(id, res)
   }
 
   @Patch(":id")
+  @ApiCreatedResponse({
+    description: "Статья успешно обновлена.",
+  })
+  @ApiForbiddenResponse({
+    description: "Недостаточно прав для выполнения этого действия.",
+  })
+  @ApiNotFoundResponse({
+    description: "Статья не найдена.",
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Не удалось обновить статью.",
+  })
   async updatePost(
     @Headers("authorization") token: string,
     @Body() dto: PostDto,
@@ -50,6 +93,18 @@ export class PostController {
   }
 
   @Delete(":id")
+  @ApiCreatedResponse({
+    description: "Статья успешно удалена.",
+  })
+  @ApiForbiddenResponse({
+    description: "Недостаточно прав для выполнения этого действия.",
+  })
+  @ApiNotFoundResponse({
+    description: "Статья не найдена.",
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Не удалось удалить статью.",
+  })
   async deletePost(
     @Headers("authorization") token: string,
     @Param("id") id: string,
@@ -59,6 +114,15 @@ export class PostController {
   }
 
   @Get("comments/:id")
+  @ApiAcceptedResponse({
+    description: "Список комментариев успешно получен.",
+  })
+  @ApiNotFoundResponse({
+    description: "Статья не найдена.",
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Не удалось получить список комментариев.",
+  })
   async getComments(@Param("id") id: string, @Res() res: Response) {
     return this.postService.getComments(id, res)
   }
