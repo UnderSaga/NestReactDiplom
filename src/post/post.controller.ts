@@ -59,7 +59,12 @@ export class PostController {
     return this.postService.getAll(res)
   }
 
-  @Get("id")
+  @Get("findByTag")
+  async filterPosts(@Res() res: Response, @Query("tag") tag?: string) {
+    return this.postService.filterPosts(tag, res)
+  }
+
+  @Get(":id")
   @ApiCreatedResponse({
     description: "Статья успешно получена.",
   })
@@ -125,10 +130,5 @@ export class PostController {
   })
   async getComments(@Param("id") id: string, @Res() res: Response) {
     return this.postService.getComments(id, res)
-  }
-
-  @Get("findByTag")
-  async filterPosts(@Res() res: Response, @Query("tag") tag?: string) {
-    return this.postService.filterPosts(tag, res)
   }
 }

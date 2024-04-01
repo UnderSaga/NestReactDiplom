@@ -61,6 +61,8 @@ export class PostService {
 
   async getOne(id: string, res: Response) {
     try {
+      console.log(id)
+
       await this.postModel
         .findByIdAndUpdate(
           {
