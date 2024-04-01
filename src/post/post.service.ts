@@ -6,7 +6,6 @@ import { PostDto } from "./post.dto"
 import { Post } from "src/schemas/post.schema"
 import { Response } from "express"
 import { JwtService } from "@nestjs/jwt"
-import { PostFilterDto } from "./postFilter.dto"
 
 @Injectable()
 export class PostService {
