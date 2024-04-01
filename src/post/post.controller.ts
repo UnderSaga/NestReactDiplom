@@ -59,7 +59,7 @@ export class PostController {
     return this.postService.getAll(res)
   }
 
-  @Get(":id")
+  @Get("id")
   @ApiCreatedResponse({
     description: "Статья успешно получена.",
   })
@@ -70,7 +70,7 @@ export class PostController {
     return this.postService.getOne(id, res)
   }
 
-  @Patch(":id")
+  @Patch("id")
   @ApiCreatedResponse({
     description: "Статья успешно обновлена.",
   })
@@ -92,7 +92,7 @@ export class PostController {
     return this.postService.updatePost(token, dto, id, res)
   }
 
-  @Delete(":id")
+  @Delete("id")
   @ApiCreatedResponse({
     description: "Статья успешно удалена.",
   })
@@ -113,7 +113,7 @@ export class PostController {
     return this.postService.deletePost(token, id, res)
   }
 
-  @Get("comments/:id")
+  @Get("comments/id")
   @ApiAcceptedResponse({
     description: "Список комментариев успешно получен.",
   })
@@ -127,7 +127,7 @@ export class PostController {
     return this.postService.getComments(id, res)
   }
 
-  @Get("filter")
+  @Get("findByTag")
   async filterPosts(@Res() res: Response, @Query("tag") tag?: string) {
     return this.postService.filterPosts(tag, res)
   }

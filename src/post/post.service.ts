@@ -84,7 +84,7 @@ export class PostService {
         })
     } catch (error) {
       res.status(500).json({
-        error: "Не удалось получить список статей.",
+        error: "Не удалось получить статью.",
       })
     }
   }
@@ -186,14 +186,20 @@ export class PostService {
   }
 
   async filterPosts(tag: string, res: Response) {
-    const list = await this.postModel.find()
+    try {
+      const list = await this.postModel.find()
 
-    const result = list.filter((item) => {
-      if (item.tags.includes(tag)) {
-        return item
-      }
-    })
+      const result = list.filter((item) => {
+        if (item.tags.includes(tag)) {
+          return item
+        }
+      })
 
-    res.json(result)
+      res.json(result)
+    } catch (error) {
+      res.status(500).json({
+        message: error,
+      })
+    }
   }
 }
