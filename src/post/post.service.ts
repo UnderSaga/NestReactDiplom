@@ -152,7 +152,7 @@ export class PostService {
       })
     } catch (error) {
       res.status(500).json({
-        error: "Не удалось получить список статей.",
+        error: "Не удалось удалить статью.",
       })
     }
   }
@@ -185,11 +185,11 @@ export class PostService {
     }
   }
 
-  async filterPosts(dto: PostFilterDto, res: Response) {
+  async filterPosts(tag: string, res: Response) {
     const list = await this.postModel.find()
 
     const result = list.filter((item) => {
-      if (item.tags.includes(dto.tag)) {
+      if (item.tags.includes(tag)) {
         return item
       }
     })

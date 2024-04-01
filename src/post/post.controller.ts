@@ -10,10 +10,10 @@ import {
   Patch,
   Delete,
   Headers,
+  Query,
 } from "@nestjs/common"
 import { PostService } from "./post.service"
 import { PostDto } from "./post.dto"
-import { PostFilterDto } from "./postFilter.dto"
 import { Response } from "express"
 import {
   ApiAcceptedResponse,
@@ -127,8 +127,8 @@ export class PostController {
     return this.postService.getComments(id, res)
   }
 
-  @Post("filter")
-  async filterPosts(@Body() dto: PostFilterDto, @Res() res: Response) {
-    return this.postService.filterPosts(dto, res)
+  @Get("filter")
+  async filterPosts(@Res() res: Response, @Query("tag") tag?: string) {
+    return this.postService.filterPosts(tag, res)
   }
 }
