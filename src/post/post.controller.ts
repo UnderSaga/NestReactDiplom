@@ -13,10 +13,10 @@ import {
 } from "@nestjs/common"
 import { PostService } from "./post.service"
 import { PostDto } from "./post.dto"
+import { PostFilterDto } from "./postFilter.dto"
 import { Response } from "express"
 import {
   ApiAcceptedResponse,
-  ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
@@ -125,5 +125,10 @@ export class PostController {
   })
   async getComments(@Param("id") id: string, @Res() res: Response) {
     return this.postService.getComments(id, res)
+  }
+
+  @Post("filter")
+  async filterPosts(@Body() dto: PostFilterDto, @Res() res: Response) {
+    return this.postService.filterPosts(dto, res)
   }
 }

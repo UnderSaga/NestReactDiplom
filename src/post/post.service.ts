@@ -6,6 +6,7 @@ import { PostDto } from "./post.dto"
 import { Post } from "src/schemas/post.schema"
 import { Response } from "express"
 import { JwtService } from "@nestjs/jwt"
+import { PostFilterDto } from "./postFilter.dto"
 
 @Injectable()
 export class PostService {
@@ -182,5 +183,17 @@ export class PostService {
         error: "Не удалось получить список комментариев.",
       })
     }
+  }
+
+  async filterPosts(dto: PostFilterDto, res: Response) {
+    const list = await this.postModel.find()
+
+    const result = list.filter((item) => {
+      if (item.tags.includes(dto.tag)) {
+        return item
+      }
+    })
+
+    res.json(result)
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
 import { CommentDto } from "./comment.dto"
@@ -60,36 +60,35 @@ export class CommentService {
 
       const findComment = await this.commentModel.findById(id)
 
-      if (decoded.role[0] != "ADMIN" && decoded._id != findComment.author) {
-        return res.status(403).json({
-          message: "Недостаточно прав для изменения комментария.",
+      if (!findComment) {
+        return res.status(404).json({
+          message: "Комментарий не найден.",
         })
       }
+
+      if (decoded.role[0] != "ADMIN" && decoded._id != findComment.author) {
+        return res.status(403).json({
+          message: "Недостаточно прав.",
+        })
+      }
+
       const { comment } = dto
 
       if (findComment.comment === comment) {
         return res.json(findComment)
       }
 
-      await this.commentModel
-        .findByIdAndUpdate(
-          {
-            _id: id,
-          },
-          {
-            comment: comment,
-            changed: true,
-          }
-        )
-        .then((com) => {
-          if (!com) {
-            return res.status(404).json({
-              message: "Комментарий не найден.",
-            })
-          }
+      await this.commentModel.findByIdAndUpdate(
+        {
+          _id: id,
+        },
+        {
+          comment: comment,
+          changed: true,
+        }
+      )
 
-          res.json({ success: true })
-        })
+      res.json({ success: true })
     } catch (error) {
       res.status(500).json({
         error: "Не удалось обновить комментарий.",
@@ -104,6 +103,12 @@ export class CommentService {
       )
 
       const findComment = await this.commentModel.findById(id)
+
+      if (!findComment) {
+        return res.status(404).json({
+          message: "Комментарий не найден.",
+        })
+      }
 
       if (decoded.role[0] != "ADMIN" && decoded._id != findComment.author) {
         return res.status(403).json({
@@ -128,17 +133,9 @@ export class CommentService {
         throw new Error()
       }
 
-      await this.commentModel
-        .findByIdAndDelete({
-          _id: id,
-        })
-        .then((com) => {
-          if (!com) {
-            return res.status(404).json({
-              message: "Комментарий не найден.",
-            })
-          }
-        })
+      await this.commentModel.findByIdAndDelete({
+        _id: id,
+      })
 
       res.json({ success: true })
     } catch (error) {
