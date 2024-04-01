@@ -17,6 +17,11 @@ export class PostService {
 
   async create(token: string, postDto: PostDto, res: Response) {
     try {
+      if (!token) {
+        res.status(403).json({
+          message: "Вы не авторизованы.",
+        })
+      }
       const decoded = await this.jwtService.verify(
         token.replace(/Bearer\s?/, "")
       )
@@ -92,6 +97,11 @@ export class PostService {
 
   async updatePost(token: string, dto: PostDto, id: string, res: Response) {
     try {
+      if (!token) {
+        res.status(403).json({
+          message: "Вы не авторизованы.",
+        })
+      }
       const decoded = await this.jwtService.verify(
         token.replace(/Bearer\s?/, "")
       )
@@ -133,6 +143,11 @@ export class PostService {
 
   async deletePost(token: string, id: string, res: Response) {
     try {
+      if (!token) {
+        res.status(403).json({
+          message: "Вы не авторизованы.",
+        })
+      }
       const decoded = await this.jwtService.verify(
         token.replace(/Bearer\s?/, "")
       )

@@ -17,6 +17,12 @@ export class CommentService {
 
   async create(token: string, dto: CommentDto, res: Response) {
     try {
+      if (!token) {
+        res.status(403).json({
+          message: "Вы не авторизованы.",
+        })
+      }
+
       const { postId, comment } = dto
       if (!comment) {
         return res.status(400).json({
@@ -54,6 +60,12 @@ export class CommentService {
 
   async update(id: string, dto: CommentDto, res: Response, token: string) {
     try {
+      if (!token) {
+        res.status(403).json({
+          message: "Вы не авторизованы.",
+        })
+      }
+
       const decoded = await this.jwtService.verify(
         token.replace(/Bearer\s?/, "")
       )
@@ -98,6 +110,12 @@ export class CommentService {
 
   async delete(token: string, id: string, res: Response) {
     try {
+      if (!token) {
+        res.status(403).json({
+          message: "Вы не авторизованы.",
+        })
+      }
+
       const decoded = await this.jwtService.verify(
         token.replace(/Bearer\s?/, "")
       )

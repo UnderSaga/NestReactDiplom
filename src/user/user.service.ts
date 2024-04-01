@@ -92,6 +92,12 @@ export class UserService {
 
   async getMe(token: string, res: Response) {
     try {
+      if (!token) {
+        res.status(403).json({
+          message: "Вы не авторизованы.",
+        })
+      }
+
       const decoded = await this.jwtService.verify(
         token.replace(/Bearer\s?/, "")
       )
@@ -113,6 +119,12 @@ export class UserService {
 
   async changeEmail(token: string, res: Response, dto: UserDto) {
     try {
+      if (!token) {
+        res.status(403).json({
+          message: "Вы не авторизованы.",
+        })
+      }
+
       const decoded = await this.jwtService.verify(
         token.replace(/Bearer\s?/, "")
       )

@@ -75,7 +75,7 @@ export class PostController {
     return this.postService.getOne(id, res)
   }
 
-  @Patch("id")
+  @Patch(":id")
   @ApiCreatedResponse({
     description: "Статья успешно обновлена.",
   })
@@ -97,7 +97,7 @@ export class PostController {
     return this.postService.updatePost(token, dto, id, res)
   }
 
-  @Delete("id")
+  @Delete(":id")
   @ApiCreatedResponse({
     description: "Статья успешно удалена.",
   })
@@ -118,7 +118,7 @@ export class PostController {
     return this.postService.deletePost(token, id, res)
   }
 
-  @Get("comments/id")
+  @Get("comments/:id")
   @ApiAcceptedResponse({
     description: "Список комментариев успешно получен.",
   })
