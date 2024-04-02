@@ -294,4 +294,27 @@ export class PostService {
       })
     }
   }
+
+  async filterPostsByBody(body: string, res: Response) {
+    this.logger.info("Начнинаем фильтрацию статей.")
+    try {
+      this.logger.info("Получем список статей.")
+      const posts = await this.postModel.find()
+
+      this.logger.info("Фильтруем статьи по полученному содержанию.")
+      const list = posts.filter((item) => {
+        if (item.body.includes(body)) {
+          return item
+        }
+      })
+
+      this.logger.info("Возвращаем отфильтрованный список статей.")
+      res.json(list)
+    } catch (error) {
+      this.logger.error("Не удалось отфильтровать список статей.")
+      res.status(500).json({
+        message: error,
+      })
+    }
+  }
 }

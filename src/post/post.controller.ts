@@ -70,6 +70,11 @@ export class PostController {
     return this.postService.filterPostsByName(name, res)
   }
 
+  @Get("findByBody")
+  async filterPostsByBody(@Res() res: Response, @Query("body") body?: string) {
+    return this.postService.filterPostsByBody(body, res)
+  }
+
   @Get(":id")
   @ApiCreatedResponse({
     description: "Статья успешно получена.",
