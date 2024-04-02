@@ -23,6 +23,7 @@ import {
   ApiNotFoundResponse,
   ApiTags,
 } from "@nestjs/swagger"
+import { ObjectId } from "mongoose"
 
 @Controller("posts")
 @ApiTags("Post")
@@ -60,8 +61,13 @@ export class PostController {
   }
 
   @Get("findByTag")
-  async filterPosts(@Res() res: Response, @Query("tag") tag?: string) {
-    return this.postService.filterPosts(tag, res)
+  async filterPostsByTag(@Res() res: Response, @Query("tag") tag?: string) {
+    return this.postService.filterPostsByTag(tag, res)
+  }
+
+  @Get("findByName")
+  async filterPostsByName(@Res() res: Response, @Query("name") name?: string) {
+    return this.postService.filterPostsByName(name, res)
   }
 
   @Get(":id")
