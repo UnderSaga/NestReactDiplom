@@ -7,6 +7,7 @@ import {
   UsePipes,
   ValidationPipe,
   Headers,
+  Logger,
 } from "@nestjs/common"
 import { UserService } from "./user.service"
 import { UserDto } from "./user.dto"
@@ -14,11 +15,11 @@ import { Response } from "express"
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
-  ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiTags,
 } from "@nestjs/swagger"
+import { WinstonLogger } from "nest-winston"
 
 @Controller("auth")
 @ApiTags("User")

@@ -1,11 +1,10 @@
 import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger"
+import { Logger } from "winston"
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    logger: ["error", "warn", "debug", "log"],
-  })
+  const app = await NestFactory.create(AppModule)
 
   const config = new DocumentBuilder()
     .setTitle("Back API")
