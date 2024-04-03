@@ -72,7 +72,7 @@ export class PostService {
           if (
             post.tags.filter((tag) => {
               if (tag.includes(tagReq)) return tag
-            })
+            }).length > 0
           ) {
             return post
           }
