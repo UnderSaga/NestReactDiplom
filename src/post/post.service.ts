@@ -61,10 +61,37 @@ export class PostService {
     }
   }
 
-  async getAll(res: Response) {
+  async getAll(res: Response, tag?: string, name?: string, body?: string) {
     try {
       this.logger.info("Начинаем получение статей.")
-      const posts = await this.postModel.find()
+      let posts = await this.postModel.find()
+
+      if (tag) {
+        this.logger.info("Сортируем статьи по тегу.")
+        posts = posts.filter((post) => {
+          if (post.tags.includes(tag)) {
+            return post
+          }
+        })
+      }
+
+      if (name) {
+        this.logger.info("Сортируем статьи по названию.")
+        posts = posts.filter((post) => {
+          if (post.header.includes(name)) {
+            return post
+          }
+        })
+      }
+
+      if (body) {
+        this.logger.info("Сортируем статьи по содержанию.")
+        posts = posts.filter((post) => {
+          if (post.body.includes(body)) {
+            return post
+          }
+        })
+      }
 
       this.logger.info("Возвращаем полученные статьи.")
       res.json(posts)
@@ -250,75 +277,6 @@ export class PostService {
       this.logger.error("Не удалось получить список комментариев.")
       res.status(500).json({
         error: "Не удалось получить список комментариев.",
-      })
-    }
-  }
-
-  async filterPostsByTag(tag: string, res: Response) {
-    this.logger.info("Начнинаем фильтрацию статей.")
-    try {
-      this.logger.info("Получем список статей.")
-      const posts = await this.postModel.find()
-
-      this.logger.info("Фильтруем статьи по полученному тегу.")
-      const list = posts.filter((item) => {
-        if (item.tags.includes(tag)) {
-          return item
-        }
-      })
-
-      this.logger.info("Возвращаем отфильтрованный список статей.")
-      res.json(list)
-    } catch (error) {
-      this.logger.error("Не удалось отфильтровать список статей.")
-      res.status(500).json({
-        message: error,
-      })
-    }
-  }
-
-  async filterPostsByName(name: string, res: Response) {
-    this.logger.info("Начнинаем фильтрацию статей.")
-    try {
-      this.logger.info("Получем список статей.")
-      const posts = await this.postModel.find()
-
-      this.logger.info("Фильтруем статьи по полученному названию.")
-      const list = posts.filter((item) => {
-        if (item.header.includes(name)) {
-          return item
-        }
-      })
-
-      this.logger.info("Возвращаем отфильтрованный список статей.")
-      res.json(list)
-    } catch (error) {
-      this.logger.error("Не удалось отфильтровать список статей.")
-      res.status(500).json({
-        message: error,
-      })
-    }
-  }
-
-  async filterPostsByBody(body: string, res: Response) {
-    this.logger.info("Начнинаем фильтрацию статей.")
-    try {
-      this.logger.info("Получем список статей.")
-      const posts = await this.postModel.find()
-
-      this.logger.info("Фильтруем статьи по полученному содержанию.")
-      const list = posts.filter((item) => {
-        if (item.body.includes(body)) {
-          return item
-        }
-      })
-
-      this.logger.info("Возвращаем отфильтрованный список статей.")
-      res.json(list)
-    } catch (error) {
-      this.logger.error("Не удалось отфильтровать список статей.")
-      res.status(500).json({
-        message: error,
       })
     }
   }

@@ -49,30 +49,20 @@ export class PostController {
     return this.postService.create(token, dto, res)
   }
 
-  @Get()
+  @Get("?")
   @ApiCreatedResponse({
     description: "Список статей успешно получен.",
   })
   @ApiInternalServerErrorResponse({
     description: "Не удалось получить список статей.",
   })
-  async getAll(@Res() res: Response) {
-    return this.postService.getAll(res)
-  }
-
-  @Get("findByTag")
-  async filterPostsByTag(@Res() res: Response, @Query("tag") tag?: string) {
-    return this.postService.filterPostsByTag(tag, res)
-  }
-
-  @Get("findByName")
-  async filterPostsByName(@Res() res: Response, @Query("name") name?: string) {
-    return this.postService.filterPostsByName(name, res)
-  }
-
-  @Get("findByBody")
-  async filterPostsByBody(@Res() res: Response, @Query("body") body?: string) {
-    return this.postService.filterPostsByBody(body, res)
+  async getAll(
+    @Res() res: Response,
+    @Query("tag") tag?: string,
+    @Query("name") name?: string,
+    @Query("body") body?: string
+  ) {
+    return this.postService.getAll(res, tag, name, body)
   }
 
   @Get(":id")
@@ -140,9 +130,9 @@ export class PostController {
     description: "Не удалось получить список комментариев.",
   })
   async getComments(
-    @Query("sort") sort: string,
     @Param("id") id: string,
-    @Res() res: Response
+    @Res() res: Response,
+    @Query("sort") sort?: string
   ) {
     return this.postService.getComments(sort, id, res)
   }
