@@ -61,15 +61,19 @@ export class PostService {
     }
   }
 
-  async getAll(res: Response, tag?: string, name?: string, body?: string) {
+  async getAll(res: Response, tagReq?: string, name?: string, body?: string) {
     try {
       this.logger.info("Начинаем получение статей.")
       let posts = await this.postModel.find()
 
-      if (tag) {
+      if (tagReq) {
         this.logger.info("Сортируем статьи по тегу.")
         posts = posts.filter((post) => {
-          if (post.tags.includes(tag)) {
+          if (
+            post.tags.filter((tag) => {
+              if (tag.includes(tagReq)) return tag
+            })
+          ) {
             return post
           }
         })
