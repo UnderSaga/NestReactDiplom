@@ -63,7 +63,7 @@ export class PostService {
 
   async getAll(res: Response) {
     try {
-      this.logger.info("Начинаем получение статьи.")
+      this.logger.info("Начинаем получение статей.")
       const posts = await this.postModel.find()
 
       this.logger.info("Возвращаем полученные статьи.")
@@ -78,7 +78,7 @@ export class PostService {
 
   async getOne(id: string, res: Response) {
     try {
-      this.logger.info("Начинаем получение одного статьи.")
+      this.logger.info("Начинаем получение одной статьи.")
       if (!id) {
         this.logger.error("Пользователь не передал id статьи.")
         res.status(400).json({
@@ -215,7 +215,7 @@ export class PostService {
     }
   }
 
-  async getComments(id: string, res: Response) {
+  async getComments(sort: string, id: string, res: Response) {
     this.logger.info("Начинаем получение комментариев под статьей.")
     try {
       this.logger.info("Ищем статью.")
@@ -240,7 +240,12 @@ export class PostService {
       )
 
       this.logger.info("Возвращаем список комментраиев.")
-      res.json(list)
+      switch (sort) {
+        case "asc":
+          return res.json(list.reverse())
+        default:
+          res.json(list)
+      }
     } catch (error) {
       this.logger.error("Не удалось получить список комментариев.")
       res.status(500).json({

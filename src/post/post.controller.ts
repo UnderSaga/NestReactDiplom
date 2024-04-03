@@ -129,7 +129,7 @@ export class PostController {
     return this.postService.deletePost(token, id, res)
   }
 
-  @Get("comments/:id")
+  @Get("comments/:id?")
   @ApiAcceptedResponse({
     description: "Список комментариев успешно получен.",
   })
@@ -139,7 +139,11 @@ export class PostController {
   @ApiInternalServerErrorResponse({
     description: "Не удалось получить список комментариев.",
   })
-  async getComments(@Param("id") id: string, @Res() res: Response) {
-    return this.postService.getComments(id, res)
+  async getComments(
+    @Query("sort") sort: string,
+    @Param("id") id: string,
+    @Res() res: Response
+  ) {
+    return this.postService.getComments(sort, id, res)
   }
 }
