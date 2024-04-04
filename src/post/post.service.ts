@@ -23,7 +23,7 @@ export class PostService {
       this.logger.info("Начало создания статьи.")
       if (!token) {
         this.logger.error("Не передан токен.")
-        res.status(403).json({
+        return res.status(403).json({
           message: "Вы не авторизованы.",
         })
       }

@@ -88,14 +88,8 @@ export class UserService {
         role: user.roles,
       })
 
-      const { _id, username, email, roles } = user
-
       this.logger.info("Пользователь авторизован.")
       res.json({
-        _id,
-        username,
-        email,
-        roles,
         token,
       })
     } catch (error) {
@@ -131,8 +125,10 @@ export class UserService {
         throw new UnauthorizedException()
       }
 
+      const { username, email, roles } = user
+
       this.logger.info("Возвращаем данные пользователя.")
-      res.json(user)
+      res.json({ username, email, roles })
     } catch (error) {
       this.logger.error("Не удалось получить данные пользователя.")
       res.status(500).json({

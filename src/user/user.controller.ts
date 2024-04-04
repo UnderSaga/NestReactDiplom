@@ -8,6 +8,7 @@ import {
   ValidationPipe,
   Headers,
   Logger,
+  Patch,
 } from "@nestjs/common"
 import { UserService } from "./user.service"
 import { UserDto } from "./user.dto"
@@ -19,7 +20,6 @@ import {
   ApiNotFoundResponse,
   ApiTags,
 } from "@nestjs/swagger"
-import { WinstonLogger } from "nest-winston"
 
 @Controller("auth")
 @ApiTags("User")
@@ -69,7 +69,7 @@ export class UserController {
     return this.userService.getMe(token, res)
   }
 
-  @Post("changeEmail")
+  @Patch("changeEmail")
   @ApiCreatedResponse({
     description: "Почта успешно изменена.",
   })
