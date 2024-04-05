@@ -23,8 +23,8 @@ export class CommentService {
     try {
       if (!token) {
         this.logger.error("Не получен токен пользователя.")
-        res.status(403).json({
-          message: "Вы не авторизованы.",
+        return res.status(403).json({
+          error: "Вы не авторизованы.",
         })
       }
 
@@ -33,7 +33,7 @@ export class CommentService {
       if (!comment) {
         this.logger.error("Не получено тело комментария.")
         return res.status(400).json({
-          message: "Комментарий не может быть пустым.",
+          error: "Комментарий не может быть пустым.",
         })
       }
 

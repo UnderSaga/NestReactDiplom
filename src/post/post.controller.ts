@@ -76,6 +76,21 @@ export class PostController {
     return this.postService.getOne(id, res)
   }
 
+  @Get(":id/like")
+  @ApiCreatedResponse({
+    description: "Статья успешно лайкнута.",
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Не удалось лайкнуть статью.",
+  })
+  async likePost(
+    @Param("id") id: string,
+    @Res() res: Response,
+    @Headers("authorization") token: string
+  ) {
+    return this.postService.likePost(id, res, token)
+  }
+
   @Patch(":id")
   @ApiCreatedResponse({
     description: "Статья успешно обновлена.",

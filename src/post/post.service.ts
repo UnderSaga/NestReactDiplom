@@ -149,6 +149,60 @@ export class PostService {
     }
   }
 
+  async likePost(id: string, res: Response, token: string) {
+    try {
+      this.logger.info("Лайкаем статью.")
+      if (!id) {
+        this.logger.error("Пользователь не передал id статьи.")
+        return res.status(400).json({
+          error: "Пользователь не передал id статьи.",
+        })
+      }
+
+      if (!token) {
+        this.logger.error("Пользователь не авторизован.")
+        return res.status(403).json({
+          error: "Пользователь не авторизован",
+        })
+      }
+
+      this.logger.info("Расшифровываем токен пользователя.")
+      const decoded = await this.jwtService.verify(
+        token.replace(/Bearer\s?/, "")
+      )
+
+      this.logger.info("Ищем статью в базе данных.")
+      const post = await this.postModel.findById(id)
+
+      if (!post) {
+        this.logger.error("Статья не найдена.")
+        return res.status(404).json({
+          error: "Статья не найдена.",
+        })
+      }
+
+      this.logger.info("Ставим лайк.")
+      await post.updateOne({
+        $push: { likes: decoded._id },
+      })
+
+      if (post.likes.includes(decoded._id)) {
+        this.logger.info("Удаляем лайк.")
+        await post.updateOne({
+          $pull: { likes: decoded._id },
+        })
+      }
+
+      this.logger.info("Возвращаем статью с лайком.")
+      res.json(post)
+    } catch (error) {
+      this.logger.error("Не удалось лайкнуть статью.")
+      res.status(500).json({
+        error: "Не удалось лайкнуть статью.",
+      })
+    }
+  }
+
   async updatePost(token: string, dto: PostDto, id: string, res: Response) {
     this.logger.info("Начинаем обновление статьи.")
     try {

@@ -23,6 +23,11 @@ export class Post {
   @Prop({ default: 0 })
   viewCount: number
 
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  })
+  likes: mongoose.Schema.Types.ObjectId[]
+
   @Prop({ default: Date.now })
   createdAt: Date
 
