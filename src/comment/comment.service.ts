@@ -213,4 +213,62 @@ export class CommentService {
       })
     }
   }
+
+  async likeComment(token: string, id: string, res: Response) {
+    this.logger.info("Лайкаем комментарий.")
+    try {
+      if (!id) {
+        this.logger.error("Не получен id комметария.")
+        res.status(400).json({
+          error: "Не получен id комметария.",
+        })
+      }
+
+      if (!token) {
+        this.logger.error("Не получен токен пользователя.")
+        res.status(403).json({
+          error: "Вы не авторизованы.",
+        })
+      }
+
+      this.logger.info("Расшифровываем токен.")
+      const decoded = await this.jwtService.verify(
+        token.replace(/Bearer\s?/, "")
+      )
+
+      this.logger.info("Ищем комментарий.")
+      const findComment = await this.commentModel.findById(id)
+
+      if (!findComment) {
+        this.logger.error("Комментарий не найден.")
+        return res.status(404).json({
+          error: "Комментарий не найден.",
+        })
+      }
+
+      try {
+        this.logger.info("Лайкаем наш комментарий.")
+        await findComment.updateOne({
+          $push: { likes: decoded._id },
+        })
+
+        if (findComment.likes.includes(decoded._id)) {
+          this.logger.info("Убираем лайк с комментария.")
+          await findComment.updateOne({
+            $pull: { likes: decoded._id },
+          })
+        }
+      } catch (error) {
+        throw new Error()
+      }
+
+      this.logger.info("Комментарий успешно лайкнут/разлайкнут.")
+      res.json(findComment)
+    } catch (error) {
+      this.logger.info("Не удалось лайкнуть комментарий.")
+      res.status(500).json({
+        error: "Не удалось лайкнуть комментарий.",
+      })
+    }
+  }
 }

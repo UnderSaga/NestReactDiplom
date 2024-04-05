@@ -12,13 +12,17 @@ export class Comment {
   @Prop({ required: true })
   comment: string
 
-  @Prop({ required: true })
+  @Prop({
+    required: true,
+  })
   @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: "User" } })
   author: mongoose.Schema.Types.ObjectId
 
-  @Prop({ required: true })
-  @Prop({ default: false })
-  changed: true
+  @Prop({ required: true, default: false })
+  changed: boolean
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] })
+  likes: mongoose.Schema.Types.ObjectId[]
 
   @Prop({ default: Date.now })
   createdAt: Date

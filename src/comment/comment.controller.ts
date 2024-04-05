@@ -9,6 +9,7 @@ import {
   Patch,
   Delete,
   Headers,
+  Get,
 } from "@nestjs/common"
 import { CommentService } from "./comment.service"
 import { CommentDto } from "./comment.dto"
@@ -83,5 +84,23 @@ export class CommentController {
     @Res() res: Response
   ) {
     return this.commentService.delete(token, id, res)
+  }
+
+  @Get(":id/likes")
+  @ApiCreatedResponse({
+    description: "Комментарий успешно лайкнут.",
+  })
+  @ApiNotFoundResponse({
+    description: "Не удалось найти комментарий.",
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Не удалось лайкнуть комментарий.",
+  })
+  async likeComment(
+    @Headers("authorization") token: string,
+    @Param("id") id: string,
+    @Res() res: Response
+  ) {
+    return this.commentService.likeComment(token, id, res)
   }
 }
