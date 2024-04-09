@@ -23,7 +23,6 @@ import {
   ApiNotFoundResponse,
   ApiTags,
 } from "@nestjs/swagger"
-import { ObjectId } from "mongoose"
 
 @Controller("posts")
 @ApiTags("Post")

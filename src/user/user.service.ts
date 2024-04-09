@@ -8,6 +8,8 @@ import * as bcrypt from "bcryptjs"
 import { Role } from "src/schemas/role.schema"
 import { Response } from "express"
 import { Logger } from "winston"
+import { UpdateUserDto } from "./updateUser.dto"
+import { error } from "console"
 
 @Injectable()
 export class UserService {
@@ -137,7 +139,7 @@ export class UserService {
     }
   }
 
-  async changeEmail(token: string, res: Response, dto: UserDto) {
+  async updateUser(token: string, res: Response, dto: UpdateUserDto) {
     try {
       this.logger.info("Начинаем смену пароля.")
       if (!token) {
@@ -161,24 +163,38 @@ export class UserService {
         throw new UnauthorizedException()
       }
 
-      this.logger.info("Меняем почту пользователя.")
-      await this.userModel.findOneAndUpdate(
-        {
-          _id: decoded._id,
-        },
-        {
-          email: dto.email,
+      if (dto.email) {
+        if (dto.email === user.email) {
+          return res.status(400).json({
+            error: "Новая почта не должна совпадать со старой.",
+          })
         }
-      )
+        this.logger.info("Меняем почту пользователя.")
+        await user.updateOne({
+          email: dto.email,
+        })
+      }
 
-      this.logger.info("Почта успешно изменена.")
+      if (dto.username) {
+        if (dto.username === user.username) {
+          return res.status(400).json({
+            error: "Новое имя не должно совпадать со старым.",
+          })
+        }
+        this.logger.info("Меняем почту пользователя.")
+        await user.updateOne({
+          username: dto.username,
+        })
+      }
+
+      this.logger.info("Данные успешно изменены.")
       res.json({
-        message: "Почта успешно изменена.",
+        message: "Данные успешно изменены.",
       })
     } catch (error) {
-      this.logger.error("Не удалось сменить почту.")
+      this.logger.error("Не удалось изменить данные.")
       res.status(500).json({
-        error: "Не удалось изменить почту.",
+        error: "Не удалось изменить данные.",
       })
     }
   }

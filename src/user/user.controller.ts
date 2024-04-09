@@ -20,6 +20,7 @@ import {
   ApiNotFoundResponse,
   ApiTags,
 } from "@nestjs/swagger"
+import { UpdateUserDto } from "./updateUser.dto"
 
 @Controller("auth")
 @ApiTags("User")
@@ -69,18 +70,12 @@ export class UserController {
     return this.userService.getMe(token, res)
   }
 
-  @Patch("changeEmail")
-  @ApiCreatedResponse({
-    description: "Почта успешно изменена.",
-  })
-  @ApiInternalServerErrorResponse({
-    description: "Не удалось изменить почту.",
-  })
-  async changeEmail(
+  @Patch("newUserData")
+  async updateUser(
     @Headers("authorization") token: string,
     @Res() res: Response,
-    @Body() dto: UserDto
+    @Body() dto: UpdateUserDto
   ) {
-    return this.userService.changeEmail(token, res, dto)
+    return this.userService.updateUser(token, res, dto)
   }
 }
