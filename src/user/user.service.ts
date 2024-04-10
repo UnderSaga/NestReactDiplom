@@ -10,6 +10,7 @@ import { Response } from "express"
 import { Logger } from "winston"
 import { UpdateUserDto } from "./updateUser.dto"
 import { error } from "console"
+import { join } from "path"
 
 @Injectable()
 export class UserService {
@@ -127,10 +128,10 @@ export class UserService {
         throw new UnauthorizedException()
       }
 
-      const { username, email, roles } = user
+      const { username, email, roles, avatarUrl } = user
 
       this.logger.info("Возвращаем данные пользователя.")
-      res.json({ username, email, roles })
+      res.json({ username, email, roles, avatarUrl })
     } catch (error) {
       this.logger.error("Не удалось получить данные пользователя.")
       res.status(500).json({
@@ -195,6 +196,60 @@ export class UserService {
       this.logger.error("Не удалось изменить данные.")
       res.status(500).json({
         error: "Не удалось изменить данные.",
+      })
+    }
+  }
+
+  async changeAvatar(token: string, res: Response, file: Express.Multer.File) {
+    try {
+      this.logger.info("Начинаем смену пароля.")
+      if (!token) {
+        this.logger.error("Не передан токен.")
+        res.status(403).json({
+          message: "Вы не авторизованы.",
+        })
+      }
+
+      this.logger.info("Расшифровываем токен.")
+      const decoded = await this.jwtService.verify(
+        token.replace(/Bearer\s?/, "")
+      )
+      this.logger.info("Ищем пользователя в базе данных.")
+      const user = await this.userModel.findOne({
+        _id: decoded._id,
+      })
+
+      if (!user) {
+        this.logger.error("Пользователь не найден.")
+        throw new UnauthorizedException()
+      }
+
+      this.logger.info("Меняем аватар.")
+      await user.updateOne({
+        avatarUrl: file.filename,
+      })
+
+      this.logger.info("Аватар успешно изменен.")
+      res.status(200).json(user)
+    } catch (error) {
+      this.logger.info("Не удалось изменить аватар.")
+      res.status(500).json({
+        error: "Не удалось изменить аватар.",
+      })
+    }
+  }
+
+  async getAvatar(avatarname: string, res: Response) {
+    this.logger.info("Получаем изображение.")
+    try {
+      const avatarPath = join(process.cwd(), "uploads/avatars/", avatarname)
+
+      this.logger.info("Возвращаем изображение.")
+      res.sendFile(avatarPath)
+    } catch (error) {
+      this.logger.info("Не удалось получить изображение.")
+      res.status(500).json({
+        error: "Не удалось получть изображение.",
       })
     }
   }

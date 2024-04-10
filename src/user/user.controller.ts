@@ -9,6 +9,9 @@ import {
   Headers,
   Logger,
   Patch,
+  UploadedFile,
+  UseInterceptors,
+  Param,
 } from "@nestjs/common"
 import { UserService } from "./user.service"
 import { UserDto } from "./user.dto"
@@ -21,6 +24,8 @@ import {
   ApiTags,
 } from "@nestjs/swagger"
 import { UpdateUserDto } from "./updateUser.dto"
+import { FileInterceptor } from "@nestjs/platform-express"
+import { diskStorage } from "multer"
 
 @Controller("auth")
 @ApiTags("User")
@@ -77,5 +82,33 @@ export class UserController {
     @Body() dto: UpdateUserDto
   ) {
     return this.userService.updateUser(token, res, dto)
+  }
+
+  @Post("avatar")
+  @UseInterceptors(
+    FileInterceptor("avatar", {
+      storage: diskStorage({
+        destination: "./uploads/avatars",
+        filename: (_, file, cb) => {
+          const extIndex = file.originalname.lastIndexOf(".")
+          cb(
+            null,
+            `${file.originalname.slice(0, extIndex)}${Date.now()}${file.originalname.slice(extIndex)}`
+          )
+        },
+      }),
+    })
+  )
+  async changeAvatar(
+    @Headers("authorization") token: string,
+    @Res() res: Response,
+    @UploadedFile() file: Express.Multer.File
+  ) {
+    return this.userService.changeAvatar(token, res, file)
+  }
+
+  @Get("avatar/:imagename")
+  async getAvatar(@Param("imagename") image: string, @Res() res: Response) {
+    return this.userService.getAvatar(image, res)
   }
 }

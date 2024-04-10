@@ -15,6 +15,6 @@ async function bootstrap() {
   SwaggerModule.setup("swagger", app, document)
 
   await app.listen(5000)
-  Logger.log(`Сервер запущен на: localhost:500`)
+  Logger.log(`Сервер запущен на: ${await app.getUrl()}`)
 }
 bootstrap()
