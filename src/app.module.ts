@@ -19,25 +19,25 @@ import { transports, format } from "winston"
       transports: [
         new transports.Console(),
         new transports.File({
-          dirname: "./log/debug/",
+          dirname: "./logs/debug/",
           filename: "debug.log",
           level: "debug",
           maxsize: Number(process.env.MAX_SIZE_FOR_LOGS),
         }),
         new transports.File({
-          dirname: "./log/warning/",
+          dirname: "./logs/warning/",
           filename: "warning.log",
           level: "warn",
           maxsize: Number(process.env.MAX_SIZE_FOR_LOGS),
         }),
         new transports.File({
-          dirname: "./log/info/",
+          dirname: "./logs/info/",
           filename: "info.log",
           level: "info",
           maxsize: Number(process.env.MAX_SIZE_FOR_LOGS),
         }),
         new transports.File({
-          dirname: "./log/error/",
+          dirname: "./logs/error/",
           filename: "error.log",
           level: "error",
           maxsize: Number(process.env.MAX_SIZE_FOR_LOGS),

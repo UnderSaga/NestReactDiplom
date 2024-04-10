@@ -21,13 +21,6 @@ export class CommentService {
   async create(token: string, dto: CommentDto, res: Response) {
     this.logger.info("Начинаем создание комментариев.")
     try {
-      if (!token) {
-        this.logger.error("Не получен токен пользователя.")
-        return res.status(403).json({
-          error: "Вы не авторизованы.",
-        })
-      }
-
       this.logger.info("Получем тело комментария и id статьи.")
       const { postId, comment } = dto
       if (!comment) {
@@ -85,13 +78,6 @@ export class CommentService {
         })
       }
 
-      if (!token) {
-        this.logger.error("Не получен токен пользователя.")
-        res.status(403).json({
-          error: "Вы не авторизованы.",
-        })
-      }
-
       this.logger.info("Расшифровываем токен пользователя.")
       const decoded = await this.jwtService.verify(
         token.replace(/Bearer\s?/, "")
@@ -104,13 +90,6 @@ export class CommentService {
         this.logger.error("Комментарий не найден.")
         return res.status(404).json({
           error: "Комментарий не найден.",
-        })
-      }
-
-      if (decoded.role[0] != "ADMIN" && decoded._id != findComment.author) {
-        this.logger.error("Недостаточно прав.")
-        return res.status(403).json({
-          error: "Недостаточно прав.",
         })
       }
 
@@ -155,13 +134,6 @@ export class CommentService {
         })
       }
 
-      if (!token) {
-        this.logger.error("Не получен токен пользователя.")
-        res.status(403).json({
-          error: "Вы не авторизованы.",
-        })
-      }
-
       this.logger.info("Расшифровываем токен.")
       const decoded = await this.jwtService.verify(
         token.replace(/Bearer\s?/, "")
@@ -174,13 +146,6 @@ export class CommentService {
         this.logger.error("Комментарий не найден.")
         return res.status(404).json({
           error: "Комментарий не найден.",
-        })
-      }
-
-      if (decoded.role[0] != "ADMIN" && decoded._id != findComment.author) {
-        this.logger.error("Недостаточно прав.")
-        return res.status(403).json({
-          error: "Недостаточно прав для изменения комментария.",
         })
       }
 
@@ -221,13 +186,6 @@ export class CommentService {
         this.logger.error("Не получен id комметария.")
         res.status(400).json({
           error: "Не получен id комметария.",
-        })
-      }
-
-      if (!token) {
-        this.logger.error("Не получен токен пользователя.")
-        res.status(403).json({
-          error: "Вы не авторизованы.",
         })
       }
 

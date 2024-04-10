@@ -10,6 +10,7 @@ import {
   Delete,
   Headers,
   Get,
+  UseGuards,
 } from "@nestjs/common"
 import { CommentService } from "./comment.service"
 import { CommentDto } from "./comment.dto"
@@ -21,6 +22,8 @@ import {
   ApiNotFoundResponse,
   ApiTags,
 } from "@nestjs/swagger"
+import { IsAuthGuard } from "src/is-auth/is-auth.guard"
+import { HasRoleGuard } from "src/has-role/has-role.guard"
 
 @Controller("comments")
 @ApiTags("Comment")
@@ -28,6 +31,7 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Post()
+  @UseGuards(IsAuthGuard)
   @ApiCreatedResponse({
     description: "Комментарий успешно создан",
   })
@@ -50,6 +54,7 @@ export class CommentController {
   }
 
   @Patch(":id")
+  @UseGuards(HasRoleGuard)
   @ApiCreatedResponse({
     description: "Комментарий успешно обновлен.",
   })
@@ -69,6 +74,7 @@ export class CommentController {
   }
 
   @Delete(":id")
+  @UseGuards(HasRoleGuard)
   @ApiCreatedResponse({
     description: "Комментарий успешно удален.",
   })
@@ -87,6 +93,7 @@ export class CommentController {
   }
 
   @Get(":id/likes")
+  @UseGuards(IsAuthGuard)
   @ApiCreatedResponse({
     description: "Комментарий успешно лайкнут.",
   })

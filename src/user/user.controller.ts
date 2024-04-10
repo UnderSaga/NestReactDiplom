@@ -7,11 +7,11 @@ import {
   UsePipes,
   ValidationPipe,
   Headers,
-  Logger,
   Patch,
   UploadedFile,
   UseInterceptors,
   Param,
+  UseGuards,
 } from "@nestjs/common"
 import { UserService } from "./user.service"
 import { UserDto } from "./user.dto"
@@ -26,6 +26,8 @@ import {
 import { UpdateUserDto } from "./updateUser.dto"
 import { FileInterceptor } from "@nestjs/platform-express"
 import { diskStorage } from "multer"
+import { HasRoleGuard } from "src/has-role/has-role.guard"
+import { IsAuthGuard } from "src/is-auth/is-auth.guard"
 
 @Controller("auth")
 @ApiTags("User")
@@ -62,6 +64,7 @@ export class UserController {
   }
 
   @Get("me")
+  @UseGuards(IsAuthGuard)
   @ApiCreatedResponse({
     description: "Данные пользователя успешно получены.",
   })
@@ -76,6 +79,7 @@ export class UserController {
   }
 
   @Patch("newUserData")
+  @UseGuards(IsAuthGuard)
   async updateUser(
     @Headers("authorization") token: string,
     @Res() res: Response,
@@ -85,6 +89,7 @@ export class UserController {
   }
 
   @Post("avatar")
+  @UseGuards(IsAuthGuard)
   @UseInterceptors(
     FileInterceptor("avatar", {
       storage: diskStorage({

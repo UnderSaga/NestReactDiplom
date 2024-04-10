@@ -11,6 +11,7 @@ import {
   Delete,
   Headers,
   Query,
+  UseGuards,
 } from "@nestjs/common"
 import { PostService } from "./post.service"
 import { PostDto } from "./post.dto"
@@ -23,6 +24,8 @@ import {
   ApiNotFoundResponse,
   ApiTags,
 } from "@nestjs/swagger"
+import { HasRoleGuard } from "src/has-role/has-role.guard"
+import { IsAuthGuard } from "src/is-auth/is-auth.guard"
 
 @Controller("posts")
 @ApiTags("Post")
@@ -30,6 +33,7 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post()
+  @UseGuards(HasRoleGuard)
   @ApiCreatedResponse({
     description: "Статья успешно создана.",
   })
@@ -40,12 +44,8 @@ export class PostController {
     description: "Не удалось создать статью.",
   })
   @UsePipes(new ValidationPipe())
-  async createPost(
-    @Headers("authorization") token: string,
-    @Body() dto: PostDto,
-    @Res() res: Response
-  ) {
-    return this.postService.create(token, dto, res)
+  async createPost(@Body() dto: PostDto, @Res() res: Response) {
+    return this.postService.create(dto, res)
   }
 
   @Get("?")
@@ -76,6 +76,7 @@ export class PostController {
   }
 
   @Get(":id/like")
+  @UseGuards(IsAuthGuard)
   @ApiCreatedResponse({
     description: "Статья успешно лайкнута.",
   })
@@ -91,6 +92,7 @@ export class PostController {
   }
 
   @Patch(":id")
+  @UseGuards(HasRoleGuard)
   @ApiCreatedResponse({
     description: "Статья успешно обновлена.",
   })
@@ -113,6 +115,7 @@ export class PostController {
   }
 
   @Delete(":id")
+  @UseGuards(HasRoleGuard)
   @ApiCreatedResponse({
     description: "Статья успешно удалена.",
   })

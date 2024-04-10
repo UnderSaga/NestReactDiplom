@@ -18,26 +18,9 @@ export class PostService {
     private readonly logger: Logger
   ) {}
 
-  async create(token: string, postDto: PostDto, res: Response) {
+  async create(postDto: PostDto, res: Response) {
     try {
       this.logger.info("Начало создания статьи.")
-      if (!token) {
-        this.logger.error("Не передан токен.")
-        return res.status(403).json({
-          message: "Вы не авторизованы.",
-        })
-      }
-      this.logger.info("Расшифровываем токен.")
-      const decoded = await this.jwtService.verify(
-        token.replace(/Bearer\s?/, "")
-      )
-
-      if (decoded.role[0] != "ADMIN") {
-        this.logger.warn("Недостаточно прав.")
-        return res.status(403).json({
-          message: "Недостаточно прав для создания статьи.",
-        })
-      }
 
       this.logger.info("Создаем модельку статьи.")
       const doc = new this.postModel({
@@ -159,13 +142,6 @@ export class PostService {
         })
       }
 
-      if (!token) {
-        this.logger.error("Пользователь не авторизован.")
-        return res.status(403).json({
-          error: "Пользователь не авторизован",
-        })
-      }
-
       this.logger.info("Расшифровываем токен пользователя.")
       const decoded = await this.jwtService.verify(
         token.replace(/Bearer\s?/, "")
@@ -206,25 +182,6 @@ export class PostService {
   async updatePost(token: string, dto: PostDto, id: string, res: Response) {
     this.logger.info("Начинаем обновление статьи.")
     try {
-      if (!token) {
-        this.logger.error("Не получен токен пользователя.")
-        res.status(403).json({
-          message: "Вы не авторизованы.",
-        })
-      }
-
-      this.logger.info("Расшифровываем токен пользователя.")
-      const decoded = await this.jwtService.verify(
-        token.replace(/Bearer\s?/, "")
-      )
-
-      if (decoded.role[0] != "ADMIN") {
-        this.logger.error("Недостаточно прав.")
-        return res.status(403).json({
-          message: "Недостаточно прав для изменения статьи.",
-        })
-      }
-
       this.logger.info("Создаем новую модельку статьи.")
       await this.postModel
         .findByIdAndUpdate(
@@ -261,25 +218,6 @@ export class PostService {
   async deletePost(token: string, id: string, res: Response) {
     this.logger.info("Начинаем удаление статьи.")
     try {
-      if (!token) {
-        this.logger.error("Не получен токен пользователя.")
-        res.status(403).json({
-          message: "Вы не авторизованы.",
-        })
-      }
-
-      this.logger.info("Расшифровываем токен.")
-      const decoded = await this.jwtService.verify(
-        token.replace(/Bearer\s?/, "")
-      )
-
-      if (decoded.role[0] != "ADMIN") {
-        this.logger.error("Недостаточно прав.")
-        return res.status(403).json({
-          message: "Недостаточно прав для удаления статьи.",
-        })
-      }
-
       this.logger.info("Ищем и удаляем статью.")
       await this.postModel.findByIdAndDelete(id).then((doc) => {
         if (!doc) {

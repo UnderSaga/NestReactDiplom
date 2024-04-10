@@ -106,12 +106,6 @@ export class UserService {
   async getMe(token: string, res: Response) {
     try {
       this.logger.info("Получение данных пользователя.")
-      if (!token) {
-        this.logger.error("Не передан токен.")
-        res.status(403).json({
-          message: "Вы не авторизованы.",
-        })
-      }
 
       this.logger.info("Расшифровываем токен.")
       const decoded = await this.jwtService.verify(
@@ -142,13 +136,7 @@ export class UserService {
 
   async updateUser(token: string, res: Response, dto: UpdateUserDto) {
     try {
-      this.logger.info("Начинаем смену пароля.")
-      if (!token) {
-        this.logger.error("Не передан токен.")
-        res.status(403).json({
-          message: "Вы не авторизованы.",
-        })
-      }
+      this.logger.info("Начинаем смену аватара.")
 
       this.logger.info("Расшифровываем токен.")
       const decoded = await this.jwtService.verify(
