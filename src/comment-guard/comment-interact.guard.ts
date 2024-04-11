@@ -6,12 +6,16 @@ import {
   UnauthorizedException,
 } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
-import { response } from "express"
+import { InjectModel } from "@nestjs/mongoose"
+import { Model } from "mongoose"
 import { Logger } from "winston"
+import { Comment } from "src/schemas/comment.schema"
+import { response } from "express"
 
 @Injectable()
-export class IsAuthGuard implements CanActivate {
+export class CommentGuard implements CanActivate {
   constructor(
+    @InjectModel(Comment.name) private commentModel: Model<Comment>,
     private jwtService: JwtService,
     @Inject("winston")
     private readonly logger: Logger
@@ -32,14 +36,26 @@ export class IsAuthGuard implements CanActivate {
     }
 
     try {
-      this.logger.info("Извлекаем данные из токена.")
+      this.logger.info("Извлекаем данные пользователя.")
       const payload = await this.jwtService.verifyAsync(token)
-      if (payload) {
-        this.logger.info("Пользователь прошел проверку.")
+
+      this.logger.info("Проверяем роль пользователя.")
+      if (payload.role.includes("ADMIN")) {
+        this.logger.info("Пользователь прошел проверку на роль.")
+        return true
+      }
+
+      const comment = await this.commentModel.findById(request.params.id)
+
+      this.logger.info(
+        "Проверяем, является ли пользователь автором комментария."
+      )
+      if (comment.author == payload._id) {
+        this.logger.info("Пользователь прошел проверку на авторство.")
         return true
       }
     } catch {
-      this.logger.info("Проверка на актуальность токена не пройдена.")
+      this.logger.error("Доступ запрещен.")
       response.status(403).json({
         error: "Доступ запрещен.",
       })

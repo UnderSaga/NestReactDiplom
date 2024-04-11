@@ -68,7 +68,7 @@ export class CommentService {
     }
   }
 
-  async update(id: string, dto: CommentDto, res: Response, token: string) {
+  async update(id: string, dto: CommentDto, res: Response) {
     this.logger.info("Начинаем обновление комментария.")
     try {
       if (!id) {
@@ -77,11 +77,6 @@ export class CommentService {
           error: "Не получен id комметария.",
         })
       }
-
-      this.logger.info("Расшифровываем токен пользователя.")
-      const decoded = await this.jwtService.verify(
-        token.replace(/Bearer\s?/, "")
-      )
 
       this.logger.info("Ищем комментарий.")
       const findComment = await this.commentModel.findById(id)
@@ -124,7 +119,7 @@ export class CommentService {
     }
   }
 
-  async delete(token: string, id: string, res: Response) {
+  async delete(id: string, res: Response) {
     this.logger.info("Начинаем удаление комментария.")
     try {
       if (!id) {
@@ -133,11 +128,6 @@ export class CommentService {
           error: "Не получен id комметария.",
         })
       }
-
-      this.logger.info("Расшифровываем токен.")
-      const decoded = await this.jwtService.verify(
-        token.replace(/Bearer\s?/, "")
-      )
 
       this.logger.info("Ищем комментарий.")
       const findComment = await this.commentModel.findById(id)

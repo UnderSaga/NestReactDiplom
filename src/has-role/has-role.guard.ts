@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
+import { response } from "express"
 import { Logger } from "winston"
 
 @Injectable()
@@ -25,7 +26,9 @@ export class HasRoleGuard implements CanActivate {
 
     if (!token) {
       this.logger.error("Токен не получен.")
-      throw new UnauthorizedException()
+      response.status(401).json({
+        error: "Пользователь не авторизован.",
+      })
     }
 
     try {
@@ -35,12 +38,13 @@ export class HasRoleGuard implements CanActivate {
       this.logger.info("Проверяем роль пользователя.")
       if (payload.role.includes("ADMIN")) {
         this.logger.info("Пользователь прошел проверку.")
-        console.log(payload)
         return true
       }
     } catch {
       this.logger.info("Проверка на роль не пройдена.")
-      throw new UnauthorizedException()
+      response.status(403).json({
+        error: "Доступ запрещен.",
+      })
     }
 
     return false

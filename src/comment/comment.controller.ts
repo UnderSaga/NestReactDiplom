@@ -24,6 +24,7 @@ import {
 } from "@nestjs/swagger"
 import { IsAuthGuard } from "src/is-auth/is-auth.guard"
 import { HasRoleGuard } from "src/has-role/has-role.guard"
+import { CommentGuard } from "src/comment-guard/comment-interact.guard"
 
 @Controller("comments")
 @ApiTags("Comment")
@@ -54,7 +55,7 @@ export class CommentController {
   }
 
   @Patch(":id")
-  @UseGuards(HasRoleGuard)
+  @UseGuards(CommentGuard)
   @ApiCreatedResponse({
     description: "Комментарий успешно обновлен.",
   })
@@ -70,11 +71,11 @@ export class CommentController {
     @Body() dto: CommentDto,
     @Res() res: Response
   ) {
-    return this.commentService.update(id, dto, res, token)
+    return this.commentService.update(id, dto, res)
   }
 
   @Delete(":id")
-  @UseGuards(HasRoleGuard)
+  @UseGuards(CommentGuard)
   @ApiCreatedResponse({
     description: "Комментарий успешно удален.",
   })
@@ -89,7 +90,7 @@ export class CommentController {
     @Param("id") id: string,
     @Res() res: Response
   ) {
-    return this.commentService.delete(token, id, res)
+    return this.commentService.delete(id, res)
   }
 
   @Get(":id/likes")
