@@ -7,7 +7,6 @@ import {
   UnauthorizedException,
 } from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
-import { response } from "express"
 import { Logger } from "winston"
 
 @Injectable()
