@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -26,12 +27,14 @@ export class CommentGuard implements CanActivate {
     const request = context.switchToHttp().getRequest()
 
     this.logger.info("Извлекаем токен.")
-    const token = request.headers.authorization.replace("Bearer ", "")
+    const token = request.headers.authorization?.replace("Bearer ", "")
 
     if (!token) {
       this.logger.error("Токен не получен.")
-      response.status(401).json({
-        error: "Пользователь не авторизован.",
+      throw new ForbiddenException({
+        error: "Доступ запрещен.",
+        description: "Токен пользователя не был получен.",
+        statusCode: 401,
       })
     }
 
@@ -53,11 +56,19 @@ export class CommentGuard implements CanActivate {
       if (comment.author == payload._id) {
         this.logger.info("Пользователь прошел проверку на авторство.")
         return true
+      } else {
+        throw new ForbiddenException({
+          error: "Доступ запрещен.",
+          description: "Пользователь не является автором комментария.",
+          statusCode: 403,
+        })
       }
     } catch {
       this.logger.error("Доступ запрещен.")
-      response.status(403).json({
+      throw new ForbiddenException({
         error: "Доступ запрещен.",
+        description: "Был предоставлен неакутальный токен.",
+        statusCode: 403,
       })
     }
 

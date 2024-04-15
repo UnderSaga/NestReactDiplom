@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -22,18 +23,28 @@ export class HasRoleGuard implements CanActivate {
     const request = context.switchToHttp().getRequest()
 
     this.logger.info("Извлекаем токен.")
-    const token = request.headers.authorization.replace("Bearer ", "")
+    const token = request.headers.authorization?.replace("Bearer ", "")
 
     if (!token) {
       this.logger.error("Токен не получен.")
-      response.status(401).json({
-        error: "Пользователь не авторизован.",
+      throw new UnauthorizedException({
+        error: "Доступ запрещен.",
+        description: "Токен пользователя не был получен.",
+        statusCode: 401,
       })
     }
 
     try {
       this.logger.info("Извлекаем данные пользователя.")
       const payload = await this.jwtService.verifyAsync(token)
+
+      if (!payload) {
+        throw new ForbiddenException({
+          error: "Доступ запрещен.",
+          description: "Был предоставлен неакутальный токен.",
+          statusCode: 403,
+        })
+      }
 
       this.logger.info("Проверяем роль пользователя.")
       if (payload.role.includes("ADMIN")) {
@@ -42,8 +53,10 @@ export class HasRoleGuard implements CanActivate {
       }
     } catch {
       this.logger.info("Проверка на роль не пройдена.")
-      response.status(403).json({
+      throw new ForbiddenException({
         error: "Доступ запрещен.",
+        description: "Недостаточно прав для выполнения данного действия.",
+        statusCode: 403,
       })
     }
 
