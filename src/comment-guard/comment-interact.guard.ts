@@ -11,7 +11,6 @@ import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
 import { Logger } from "winston"
 import { Comment } from "src/schemas/comment.schema"
-import { response } from "express"
 
 @Injectable()
 export class CommentGuard implements CanActivate {
@@ -31,7 +30,7 @@ export class CommentGuard implements CanActivate {
 
     if (!token) {
       this.logger.error("Токен не получен.")
-      throw new ForbiddenException({
+      throw new UnauthorizedException({
         error: "Доступ запрещен.",
         description: "Токен пользователя не был получен.",
         statusCode: 401,
