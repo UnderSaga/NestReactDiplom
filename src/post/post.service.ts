@@ -157,20 +157,36 @@ export class PostService {
         })
       }
 
-      this.logger.info("Ставим лайк.")
-      await post.updateOne({
-        $push: { likes: decoded._id },
-      })
+      let state: boolean
 
       if (post.likes.includes(decoded._id)) {
         this.logger.info("Удаляем лайк.")
-        await post.updateOne({
-          $pull: { likes: decoded._id },
-        })
+        await post.updateOne(
+          {
+            $pull: { likes: decoded._id },
+          },
+          {
+            returnDocument: "after",
+          }
+        )
+
+        state = false
+      } else {
+        this.logger.info("Ставим лайк.")
+        await post.updateOne(
+          {
+            $push: { likes: decoded._id },
+          },
+          {
+            returnDocument: "after",
+          }
+        )
+        state = true
       }
 
+      const { likes } = await this.postModel.findById(id)
       this.logger.info("Возвращаем статью с лайком.")
-      res.json(post)
+      res.json({ state: state, likes })
     } catch (error) {
       this.logger.error("Не удалось лайкнуть статью.")
       res.status(500).json({

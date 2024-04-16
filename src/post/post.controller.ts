@@ -75,7 +75,7 @@ export class PostController {
     return this.postService.getOne(id, res)
   }
 
-  @Get(":id/like")
+  @Patch(":id/like")
   @UseGuards(IsAuthGuard)
   @ApiCreatedResponse({
     description: "Статья успешно лайкнута.",
