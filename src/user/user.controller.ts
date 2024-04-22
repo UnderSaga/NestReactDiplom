@@ -26,8 +26,8 @@ import {
 import { UpdateUserDto } from "./updateUser.dto"
 import { FileInterceptor } from "@nestjs/platform-express"
 import { diskStorage } from "multer"
-import { HasRoleGuard } from "src/has-role/has-role.guard"
-import { IsAuthGuard } from "src/is-auth/is-auth.guard"
+import { HasRoleGuard } from "src/guards/has-role/has-role.guard"
+import { IsAuthGuard } from "src/guards/is-auth/is-auth.guard"
 
 @Controller("auth")
 @ApiTags("User")

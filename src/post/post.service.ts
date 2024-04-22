@@ -7,6 +7,7 @@ import { Post } from "src/schemas/post.schema"
 import { Response } from "express"
 import { JwtService } from "@nestjs/jwt"
 import { Logger } from "winston"
+import { error, log } from "console"
 
 @Injectable()
 export class PostService {
@@ -169,7 +170,6 @@ export class PostService {
             returnDocument: "after",
           }
         )
-
         state = false
       } else {
         this.logger.info("Ставим лайк.")
@@ -186,7 +186,7 @@ export class PostService {
 
       const { likes } = await this.postModel.findById(id)
       this.logger.info("Возвращаем статью с лайком.")
-      res.json({ state: state, likes })
+      res.json({ state, likes })
     } catch (error) {
       this.logger.error("Не удалось лайкнуть статью.")
       res.status(500).json({

@@ -24,8 +24,8 @@ import {
   ApiNotFoundResponse,
   ApiTags,
 } from "@nestjs/swagger"
-import { HasRoleGuard } from "src/has-role/has-role.guard"
-import { IsAuthGuard } from "src/is-auth/is-auth.guard"
+import { HasRoleGuard } from "src/guards/has-role/has-role.guard"
+import { IsAuthGuard } from "src/guards/is-auth/is-auth.guard"
 
 @Controller("posts")
 @ApiTags("Post")

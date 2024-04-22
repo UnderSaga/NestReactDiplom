@@ -9,7 +9,6 @@ import { Role } from "src/schemas/role.schema"
 import { Response } from "express"
 import { Logger } from "winston"
 import { UpdateUserDto } from "./updateUser.dto"
-import { error } from "console"
 import { join } from "path"
 
 @Injectable()
