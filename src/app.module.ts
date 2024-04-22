@@ -5,6 +5,7 @@ import { CommentModule } from "./comment/comment.module"
 import { MongooseModule } from "@nestjs/mongoose"
 import { WinstonModule } from "nest-winston"
 import { transports, format } from "winston"
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { transports, format } from "winston"
         }),
       ],
     }),
+    AuthModule,
   ],
   controllers: [],
   providers: [],

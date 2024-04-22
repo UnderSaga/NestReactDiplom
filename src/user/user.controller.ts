@@ -4,8 +4,6 @@ import {
   Get,
   Post,
   Res,
-  UsePipes,
-  ValidationPipe,
   Headers,
   Patch,
   UploadedFile,
@@ -14,10 +12,8 @@ import {
   UseGuards,
 } from "@nestjs/common"
 import { UserService } from "./user.service"
-import { UserDto } from "./user.dto"
 import { Response } from "express"
 import {
-  ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -26,42 +22,12 @@ import {
 import { UpdateUserDto } from "./updateUser.dto"
 import { FileInterceptor } from "@nestjs/platform-express"
 import { diskStorage } from "multer"
-import { HasRoleGuard } from "src/guards/has-role/has-role.guard"
 import { IsAuthGuard } from "src/guards/is-auth/is-auth.guard"
 
-@Controller("auth")
+@Controller("user")
 @ApiTags("User")
 export class UserController {
   constructor(private readonly userService: UserService) {}
-
-  @Post("registration")
-  @ApiCreatedResponse({
-    description: "Пользователь успешно зарегистрирован.",
-  })
-  @ApiInternalServerErrorResponse({
-    description: "Не удалось создать пользователя.",
-  })
-  @UsePipes(new ValidationPipe())
-  async registration(@Body() dto: UserDto, @Res() res: Response) {
-    return this.userService.create(dto, res)
-  }
-
-  @Post("login")
-  @ApiCreatedResponse({
-    description: "Пользователь успешно авторизован.",
-  })
-  @ApiNotFoundResponse({
-    description: "Пользователь не найден.",
-  })
-  @ApiBadRequestResponse({
-    description: "Неверный логин или пароль.",
-  })
-  @ApiInternalServerErrorResponse({
-    description: "Не удалось войти в учетную запись.",
-  })
-  async login(@Body() dto: UserDto, @Res() res: Response) {
-    return this.userService.login(dto, res)
-  }
 
   @Get("me")
   @UseGuards(IsAuthGuard)
