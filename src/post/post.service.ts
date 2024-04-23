@@ -133,6 +133,38 @@ export class PostService {
     }
   }
 
+  async getLatestLiked(res: Response, token: string) {
+    try {
+      this.logger.info("Начинаем получение лайкнутых статей.")
+      this.logger.info("Расщифровываем токен.")
+      const decoded = await this.jwtService.decode(
+        token.replace(/Bearer\s?/, "")
+      )
+
+      this.logger.info("Получаем все статьи.")
+      const allPosts = await this.postModel.find()
+
+      if (!allPosts) {
+        this.logger.info("Не удалось получить список всех статей.")
+        res.status(404).json({
+          error: "Не удалось получить список всех статей.",
+        })
+      }
+
+      this.logger.info("Фильтруем полученные статьи.")
+      const likedPosts = allPosts.filter((post) => {
+        if (post.likes.includes(decoded._id)) return post
+      })
+
+      this.logger.info("Возвращаем полученный список статей.")
+      res.json({ posts: likedPosts })
+    } catch (error) {
+      res.status(500).json({
+        error: "Не удалось получить последние лайкнутые посты.",
+      })
+    }
+  }
+
   async likePost(id: string, res: Response, token: string) {
     try {
       this.logger.info("Лайкаем статью.")

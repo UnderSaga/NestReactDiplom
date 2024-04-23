@@ -20,6 +20,9 @@ export class User {
   @Prop({ type: [{ type: String, ref: "Role" }] })
   roles: string[]
 
+  @Prop({ required: false })
+  session: string
+
   @Prop({ default: Date.now })
   createdAt: Date
 }

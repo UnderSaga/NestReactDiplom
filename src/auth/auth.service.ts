@@ -1,4 +1,9 @@
-import { Inject, Injectable, UnauthorizedException } from "@nestjs/common"
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common"
 import { JwtService } from "@nestjs/jwt"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
@@ -39,10 +44,22 @@ export class AuthService {
         username,
         password: hash,
         roles: [userRole.value],
+        session: "",
       })
 
-      this.logger.info("Сохранение пользователя в базу данных.")
-      user.save()
+      const codeForRefToken = randomBytes(10)
+      this.logger.info("Создание refresh-токена для пользователя.")
+      const refToken = this.jwtService.sign(
+        {
+          code: codeForRefToken,
+          _id: user._id,
+        },
+        {
+          expiresIn: "30d",
+        }
+      )
+
+      user.session = refToken
 
       this.logger.info("Создание токена для пользователя.")
       const accessToken = this.jwtService.sign({
@@ -51,16 +68,8 @@ export class AuthService {
         role: user.roles,
       })
 
-      const codeForRefToken = randomBytes(10)
-      this.logger.info("Создание refresh-токена для пользователя.")
-      const refToken = this.jwtService.sign(
-        {
-          code: codeForRefToken,
-        },
-        {
-          expiresIn: "30d",
-        }
-      )
+      this.logger.info("Сохранение пользователя в базу данных.")
+      user.save()
 
       this.logger.info(`Создан пользователь с токеном: ${accessToken}`)
       res.json({ accessToken, refToken })
@@ -93,13 +102,6 @@ export class AuthService {
         })
       }
 
-      this.logger.info("Генерация нового токена для пользователя.")
-      const accessToken = this.jwtService.sign({
-        _id: user._id,
-        name: user.username,
-        role: user.roles,
-      })
-
       const codeForRefToken = randomBytes(10)
       this.logger.info("Генерация нового refresh-токена для пользователя.")
       const refToken = this.jwtService.sign(
@@ -111,6 +113,17 @@ export class AuthService {
           expiresIn: "30d",
         }
       )
+
+      user.session = refToken
+
+      this.logger.info("Генерация нового токена для пользователя.")
+      const accessToken = this.jwtService.sign({
+        _id: user._id,
+        name: user.username,
+        role: user.roles,
+      })
+
+      user.save()
 
       this.logger.info("Пользователь авторизован.")
       res.json({ accessToken, refToken })
@@ -133,6 +146,26 @@ export class AuthService {
       const { _id } = this.jwtService.decode(refToken)
       const user = await this.userModel.findById(_id)
 
+      console.log(user.session)
+
+      if (user.session != refToken) {
+        throw new ForbiddenException()
+      }
+
+      const codeForRefToken = randomBytes(10)
+      this.logger.info("Генерация нового refresh-токена для пользователя.")
+      const newRefToken = this.jwtService.sign(
+        {
+          code: codeForRefToken.toString(),
+          _id: user._id,
+        },
+        {
+          expiresIn: "30d",
+        }
+      )
+
+      user.session = newRefToken
+
       this.logger.info("Генерация нового токена для пользователя.")
       const accessToken = this.jwtService.sign({
         _id: user._id,
@@ -140,8 +173,10 @@ export class AuthService {
         role: user.roles,
       })
 
-      this.logger.info("Возвращаем новый токен.")
-      res.json({ accessToken })
+      user.save()
+
+      this.logger.info("Возвращаем новые токены.")
+      res.json({ accessToken, refToken: newRefToken })
     } catch (error) {
       this.logger.error("Не удалось обновить токен пользователя.")
       res.status(500).json({

@@ -64,6 +64,20 @@ export class PostController {
     return this.postService.getAll(res, tag, name, body)
   }
 
+  @Get("latest")
+  @ApiCreatedResponse({
+    description: "Список статей успешно получен.",
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Не удалось получить список статей.",
+  })
+  async getLiked(
+    @Res() res: Response,
+    @Headers("authorization") token: string
+  ) {
+    return this.postService.getLatestLiked(res, token)
+  }
+
   @Get(":id")
   @ApiCreatedResponse({
     description: "Статья успешно получена.",
