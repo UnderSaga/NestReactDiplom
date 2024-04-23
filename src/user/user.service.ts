@@ -3,12 +3,10 @@ import { InjectModel } from "@nestjs/mongoose"
 import { User } from "src/schemas/user.schema"
 import { Model } from "mongoose"
 import { JwtService } from "@nestjs/jwt"
-import * as bcrypt from "bcryptjs"
 import { Response } from "express"
 import { Logger } from "winston"
 import { UpdateUserDto } from "./updateUser.dto"
 import { join } from "path"
-import { randomBytes } from "crypto"
 
 @Injectable()
 export class UserService {
@@ -38,10 +36,16 @@ export class UserService {
         throw new UnauthorizedException()
       }
 
-      const { username, email, roles, avatarUrl } = user
+      const { username, email, roles, avatarUrl, createdAt } = user
 
       this.logger.info("Возвращаем данные пользователя.")
-      res.json({ username, email, roles, avatarUrl })
+      res.json({
+        username,
+        email,
+        roles,
+        avatarUrl,
+        withUs: createdAt.toLocaleDateString(),
+      })
     } catch (error) {
       this.logger.error("Не удалось получить данные пользователя.")
       res.status(500).json({
