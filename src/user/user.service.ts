@@ -1,6 +1,6 @@
 import { Inject, Injectable, UnauthorizedException } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
-import { User } from "src/schemas/user.schema"
+import { User } from "src/schemas/index.schema"
 import { Model } from "mongoose"
 import { JwtService } from "@nestjs/jwt"
 import { Response } from "express"

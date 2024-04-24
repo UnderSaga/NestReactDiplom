@@ -22,9 +22,7 @@ import {
   ApiNotFoundResponse,
   ApiTags,
 } from "@nestjs/swagger"
-import { IsAuthGuard } from "src/guards/is-auth/is-auth.guard"
-import { HasRoleGuard } from "src/guards/has-role/has-role.guard"
-import { CommentGuard } from "src/guards/comment-guard/comment-interact.guard"
+import { IsAuthGuard, CommentGuard } from "src/guards/index.guards"
 
 @Controller("comments")
 @ApiTags("Comment")

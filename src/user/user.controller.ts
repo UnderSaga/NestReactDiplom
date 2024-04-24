@@ -22,7 +22,7 @@ import {
 import { UpdateUserDto } from "./updateUser.dto"
 import { FileInterceptor } from "@nestjs/platform-express"
 import { diskStorage } from "multer"
-import { IsAuthGuard } from "src/guards/is-auth/is-auth.guard"
+import { IsAuthGuard } from "../guards/index.guards"
 
 @Controller("user")
 @ApiTags("User")

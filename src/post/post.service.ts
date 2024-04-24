@@ -1,13 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
-import { Comment } from "src/schemas/comment.schema"
 import { Model } from "mongoose"
 import { PostDto } from "./post.dto"
-import { Post } from "src/schemas/post.schema"
+import { Post, Comment } from "src/schemas/index.schema"
 import { Response } from "express"
 import { JwtService } from "@nestjs/jwt"
 import { Logger } from "winston"
-import { error, log } from "console"
 
 @Injectable()
 export class PostService {

@@ -7,12 +7,10 @@ import {
 import { JwtService } from "@nestjs/jwt"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { Role } from "src/schemas/role.schema"
-import { User } from "src/schemas/user.schema"
+import { User, Role } from "src/schemas/index.schema"
 import { Logger } from "winston"
 import { AuthDto } from "./auth.dto"
 import * as bcrypt from "bcryptjs"
-import { randomBytes } from "crypto"
 import { Response } from "express"
 import { TokenGenerator } from "../utils/tokenGenerator.utils"
 
