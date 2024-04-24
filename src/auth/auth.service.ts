@@ -14,6 +14,7 @@ import { AuthDto } from "./auth.dto"
 import * as bcrypt from "bcryptjs"
 import { randomBytes } from "crypto"
 import { Response } from "express"
+import { TokenGenerator } from "../utils/tokenGenerator.utils"
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,7 @@ export class AuthService {
     private jwtService: JwtService,
     @Inject("winston")
     private readonly logger: Logger,
+    private tokenGenerator: TokenGenerator,
     @InjectModel(Role.name) private roleModel: Model<Role>,
     @InjectModel(User.name) private userModel: Model<User>
   ) {}
@@ -47,26 +49,19 @@ export class AuthService {
         session: "",
       })
 
-      const codeForRefToken = randomBytes(10)
-      this.logger.info("Создание refresh-токена для пользователя.")
-      const refToken = this.jwtService.sign(
-        {
-          code: codeForRefToken,
-          _id: user._id,
-        },
-        {
-          expiresIn: "30d",
-        }
-      )
-
-      user.session = refToken
-
-      this.logger.info("Создание токена для пользователя.")
-      const accessToken = this.jwtService.sign({
+      const payload = {
         _id: user._id,
         name: user.username,
         role: user.roles,
-      })
+      }
+
+      this.logger.info("Создание токена для пользователя.")
+      const accessToken = await this.tokenGenerator.generateAccessToken(payload)
+
+      this.logger.info("Создание refresh-токена для пользователя.")
+      const refToken = await this.tokenGenerator.generateRefreshToken(user._id)
+
+      user.session = refToken.toString()
 
       this.logger.info("Сохранение пользователя в базу данных.")
       user.save()
@@ -102,26 +97,19 @@ export class AuthService {
         })
       }
 
-      const codeForRefToken = randomBytes(10)
       this.logger.info("Генерация нового refresh-токена для пользователя.")
-      const refToken = this.jwtService.sign(
-        {
-          code: codeForRefToken.toString(),
-          _id: user._id,
-        },
-        {
-          expiresIn: "30d",
-        }
-      )
+      const refToken = await this.tokenGenerator.generateRefreshToken(user._id)
 
       user.session = refToken
 
-      this.logger.info("Генерация нового токена для пользователя.")
-      const accessToken = this.jwtService.sign({
+      const payload = {
         _id: user._id,
         name: user.username,
         role: user.roles,
-      })
+      }
+
+      this.logger.info("Генерация нового токена для пользователя.")
+      const accessToken = await this.tokenGenerator.generateAccessToken(payload)
 
       user.save()
 
@@ -146,32 +134,25 @@ export class AuthService {
       const { _id } = this.jwtService.decode(refToken)
       const user = await this.userModel.findById(_id)
 
-      console.log(user.session)
-
       if (user.session != refToken) {
         throw new ForbiddenException()
       }
 
-      const codeForRefToken = randomBytes(10)
       this.logger.info("Генерация нового refresh-токена для пользователя.")
-      const newRefToken = this.jwtService.sign(
-        {
-          code: codeForRefToken.toString(),
-          _id: user._id,
-        },
-        {
-          expiresIn: "30d",
-        }
+      const newRefToken = await this.tokenGenerator.generateRefreshToken(
+        user._id
       )
 
       user.session = newRefToken
 
-      this.logger.info("Генерация нового токена для пользователя.")
-      const accessToken = this.jwtService.sign({
+      const payload = {
         _id: user._id,
         name: user.username,
         role: user.roles,
-      })
+      }
+
+      this.logger.info("Генерация нового токена для пользователя.")
+      const accessToken = await this.tokenGenerator.generateAccessToken(payload)
 
       user.save()
 
