@@ -193,24 +193,40 @@ export class CommentService {
         })
       }
 
-      try {
-        this.logger.info("Лайкаем наш комментарий.")
-        await findComment.updateOne({
-          $push: { likes: decoded._id },
-        })
+      let state: boolean
 
+      try {
         if (findComment.likes.includes(decoded._id)) {
-          this.logger.info("Убираем лайк с комментария.")
-          await findComment.updateOne({
-            $pull: { likes: decoded._id },
-          })
+          this.logger.info("Удаляем лайк.")
+          await findComment.updateOne(
+            {
+              $pull: { likes: decoded._id },
+            },
+            {
+              returnDocument: "after",
+            }
+          )
+          state = false
+        } else {
+          this.logger.info("Ставим лайк.")
+          await findComment.updateOne(
+            {
+              $push: { likes: decoded._id },
+            },
+            {
+              returnDocument: "after",
+            }
+          )
+          state = true
         }
       } catch (error) {
         throw new Error()
       }
 
+      const { likes } = await this.commentModel.findById(id)
+
       this.logger.info("Комментарий успешно лайкнут/разлайкнут.")
-      res.json(findComment)
+      res.json({ state, likes })
     } catch (error) {
       this.logger.info("Не удалось лайкнуть комментарий.")
       res.status(500).json({

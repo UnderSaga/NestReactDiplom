@@ -91,7 +91,7 @@ export class CommentController {
     return this.commentService.delete(id, res)
   }
 
-  @Get(":id/likes")
+  @Patch(":id/likes")
   @UseGuards(IsAuthGuard)
   @ApiCreatedResponse({
     description: "Комментарий успешно лайкнут.",
