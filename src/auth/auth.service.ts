@@ -13,6 +13,7 @@ import { AuthDto } from "./auth.dto"
 import * as bcrypt from "bcryptjs"
 import { Response } from "express"
 import { TokenGenerator } from "../utils/tokenGenerator.utils"
+import { REDIRECT_METADATA } from "@nestjs/common/constants"
 
 @Injectable()
 export class AuthService {
@@ -160,6 +161,32 @@ export class AuthService {
       this.logger.error("Не удалось обновить токен пользователя.")
       res.status(500).json({
         error: "Не удалось обновить токен пользователя.",
+      })
+    }
+  }
+
+  async logout(refToken: string, res: Response) {
+    try {
+      this.logger.info("Проверка рефреш-токена.")
+      if (!this.jwtService.verify(refToken)) {
+        throw new UnauthorizedException("Рефреш-токен не является подлиным.")
+      }
+
+      this.logger.info("Получение пользователя из рефреш-токена.")
+      const { _id } = this.jwtService.decode(refToken)
+      const user = await this.userModel.findById(_id)
+
+      user.session = null
+
+      await user.save()
+
+      res.json({
+        message: "Вы успешно вышли из аккаунта",
+      })
+    } catch (error) {
+      this.logger.error("Не удалось выйти из аккаунта.")
+      res.status(500).json({
+        error: "Не удалось выйти из аккаунта.",
       })
     }
   }

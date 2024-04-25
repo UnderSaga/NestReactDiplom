@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Patch,
   Post,
   Res,
   UsePipes,
@@ -49,8 +50,13 @@ export class AuthController {
     return this.authService.login(dto, res)
   }
 
-  @Post("refresh")
+  @Patch("refresh")
   async refresh(@Body("refresh") token: string, @Res() res: Response) {
     return this.authService.refresh(token, res)
+  }
+
+  @Patch("logout")
+  async logout(@Body("refresh") token: string, @Res() res: Response) {
+    return this.authService.logout(token, res)
   }
 }
