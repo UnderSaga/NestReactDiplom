@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
-import { HydratedDocument } from "mongoose"
+import mongoose, { HydratedDocument, ObjectId } from "mongoose"
 
 export type UserDocument = HydratedDocument<User>
 
@@ -20,10 +20,10 @@ export class User {
   @Prop({ type: [{ type: String, ref: "Role" }] })
   roles: string[]
 
-  @Prop({ required: false })
-  session: string
+  @Prop({ type: [{ type: mongoose.Types.ObjectId, ref: "Session" }] })
+  session: mongoose.Types.ObjectId[]
 
-  @Prop({ default: Date.now })
+  @Prop({ default: Date.now() })
   createdAt: Date
 }
 

@@ -7,13 +7,12 @@ import {
 import { JwtService } from "@nestjs/jwt"
 import { InjectModel } from "@nestjs/mongoose"
 import { Model } from "mongoose"
-import { User, Role } from "src/schemas/index.schema"
+import { User, Role, Session } from "src/schemas/index.schema"
 import { Logger } from "winston"
 import { AuthDto } from "./auth.dto"
 import * as bcrypt from "bcryptjs"
 import { Response } from "express"
 import { TokenGenerator } from "../utils/tokenGenerator.utils"
-import { REDIRECT_METADATA } from "@nestjs/common/constants"
 
 @Injectable()
 export class AuthService {
@@ -23,7 +22,8 @@ export class AuthService {
     private readonly logger: Logger,
     private tokenGenerator: TokenGenerator,
     @InjectModel(Role.name) private roleModel: Model<Role>,
-    @InjectModel(User.name) private userModel: Model<User>
+    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Session.name) private sessionModel: Model<Session>
   ) {}
 
   async registration(authDto: AuthDto, res: Response) {
@@ -60,7 +60,12 @@ export class AuthService {
       this.logger.info("Создание refresh-токена для пользователя.")
       const refToken = await this.tokenGenerator.generateRefreshToken(user._id)
 
-      user.session = refToken.toString()
+      const newSession = new this.sessionModel({
+        refToken,
+        userAgent: "",
+      })
+
+      user.session.push(newSession._id)
 
       this.logger.info("Сохранение пользователя в базу данных.")
       user.save()
@@ -99,7 +104,12 @@ export class AuthService {
       this.logger.info("Генерация нового refresh-токена для пользователя.")
       const refToken = await this.tokenGenerator.generateRefreshToken(user._id)
 
-      user.session = refToken
+      const newSession = new this.sessionModel({
+        refToken,
+        userAgent: "",
+      })
+
+      user.session.push(newSession._id)
 
       const payload = {
         _id: user._id,
@@ -110,7 +120,7 @@ export class AuthService {
       this.logger.info("Генерация нового токена для пользователя.")
       const accessToken = await this.tokenGenerator.generateAccessToken(payload)
 
-      user.save()
+      await user.save()
 
       this.logger.info("Пользователь авторизован.")
       res.json({ accessToken, refToken })
@@ -133,7 +143,13 @@ export class AuthService {
       const { _id } = this.jwtService.decode(refToken)
       const user = await this.userModel.findById(_id)
 
-      if (user.session != refToken) {
+      const allSessions = await this.sessionModel.find()
+
+      if (
+        allSessions.filter((session) => {
+          if (session.refToken === refToken) return session
+        }).length < 1
+      ) {
         throw new ForbiddenException()
       }
 
@@ -142,7 +158,14 @@ export class AuthService {
         user._id
       )
 
-      user.session = newRefToken
+      const curSession = await this.sessionModel.findOneAndUpdate(
+        { refToken },
+        {
+          refToken: newRefToken,
+        }
+      )
+
+      user.session.push(curSession._id)
 
       const payload = {
         _id: user._id,
