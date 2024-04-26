@@ -6,6 +6,7 @@ import {
   Res,
   UsePipes,
   ValidationPipe,
+  Headers,
 } from "@nestjs/common"
 import { AuthService } from "./auth.service"
 import {
@@ -46,13 +47,21 @@ export class AuthController {
   @ApiInternalServerErrorResponse({
     description: "Не удалось войти в учетную запись.",
   })
-  async login(@Body() dto: AuthDto, @Res() res: Response) {
-    return this.authService.login(dto, res)
+  async login(
+    @Headers("user-agent") ua: string,
+    @Body() dto: AuthDto,
+    @Res() res: Response
+  ) {
+    return this.authService.login(ua, dto, res)
   }
 
   @Patch("refresh")
-  async refresh(@Body("refresh") token: string, @Res() res: Response) {
-    return this.authService.refresh(token, res)
+  async refresh(
+    @Headers("user-agent") ua: string,
+    @Body("refresh") token: string,
+    @Res() res: Response
+  ) {
+    return this.authService.refresh(ua, token, res)
   }
 
   @Patch("logout")

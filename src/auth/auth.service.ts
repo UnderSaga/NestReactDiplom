@@ -65,6 +65,8 @@ export class AuthService {
         userAgent: "",
       })
 
+      await newSession.save()
+
       user.session.push(newSession._id)
 
       this.logger.info("Сохранение пользователя в базу данных.")
@@ -80,7 +82,7 @@ export class AuthService {
     }
   }
 
-  async login(authDto: AuthDto, res: Response) {
+  async login(ua: string, authDto: AuthDto, res: Response) {
     try {
       this.logger.info("Начало авторизации пользователя.")
       const user = await this.userModel.findOne({ email: authDto.email })
@@ -101,15 +103,43 @@ export class AuthService {
         })
       }
 
+      const allSessions = await this.sessionModel.find()
+
+      const userSessions = allSessions.filter((oneSession) => {
+        if (user.session.includes(oneSession._id)) {
+          return oneSession
+        }
+      })
+
+      const curSession = userSessions.filter((userSession) => {
+        if (userSession.userAgent.includes(ua)) {
+          return userSession
+        }
+      })
+
       this.logger.info("Генерация нового refresh-токена для пользователя.")
       const refToken = await this.tokenGenerator.generateRefreshToken(user._id)
 
-      const newSession = new this.sessionModel({
-        refToken,
-        userAgent: "",
-      })
+      if (curSession.length === 0) {
+        this.logger.info("Создание новой сессии пользователя.")
+        const newSession = new this.sessionModel({
+          refToken,
+          userAgent: ua,
+        })
 
-      user.session.push(newSession._id)
+        await newSession.save()
+
+        user.session.push(newSession._id)
+      } else {
+        await this.sessionModel.findOneAndUpdate(
+          {
+            _id: curSession[0]._id,
+          },
+          {
+            refToken: refToken,
+          }
+        )
+      }
 
       const payload = {
         _id: user._id,
@@ -132,7 +162,8 @@ export class AuthService {
     }
   }
 
-  async refresh(refToken: string, res: Response) {
+  async refresh(ua: string, refToken: string, res: Response) {
+    console.log(ua)
     try {
       this.logger.info("Проверка рефреш-токена.")
       if (!this.jwtService.verify(refToken)) {
@@ -158,14 +189,12 @@ export class AuthService {
         user._id
       )
 
-      const curSession = await this.sessionModel.findOneAndUpdate(
+      await this.sessionModel.findOneAndUpdate(
         { refToken },
         {
           refToken: newRefToken,
         }
       )
-
-      user.session.push(curSession._id)
 
       const payload = {
         _id: user._id,
