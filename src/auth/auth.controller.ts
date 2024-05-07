@@ -14,10 +14,12 @@ import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
+  ApiTags,
 } from "@nestjs/swagger"
 import { AuthDto } from "./auth.dto"
 import { Response } from "express"
 
+@ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -56,6 +58,18 @@ export class AuthController {
   }
 
   @Patch("refresh")
+  @ApiCreatedResponse({
+    description: "Пользователь успешно авторизован.",
+  })
+  @ApiNotFoundResponse({
+    description: "Сессия не найдена.",
+  })
+  @ApiBadRequestResponse({
+    description: "Пользователь не передал рефреш-токен.",
+  })
+  @ApiInternalServerErrorResponse({
+    description: "Не удалось обновить сессию.",
+  })
   async refresh(
     @Headers("user-agent") ua: string,
     @Body("refresh") token: string,

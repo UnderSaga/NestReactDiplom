@@ -119,12 +119,11 @@ export class PostController {
     description: "Не удалось обновить статью.",
   })
   async updatePost(
-    @Headers("authorization") token: string,
     @Body() dto: PostDto,
     @Param("id") id: string,
     @Res() res: Response
   ) {
-    return this.postService.updatePost(token, dto, id, res)
+    return this.postService.updatePost(dto, id, res)
   }
 
   @Delete(":id")
@@ -141,12 +140,8 @@ export class PostController {
   @ApiInternalServerErrorResponse({
     description: "Не удалось удалить статью.",
   })
-  async deletePost(
-    @Headers("authorization") token: string,
-    @Param("id") id: string,
-    @Res() res: Response
-  ) {
-    return this.postService.deletePost(token, id, res)
+  async deletePost(@Param("id") id: string, @Res() res: Response) {
+    return this.postService.deletePost(id, res)
   }
 
   @Get("comments/:id?")

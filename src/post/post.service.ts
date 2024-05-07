@@ -225,7 +225,7 @@ export class PostService {
     }
   }
 
-  async updatePost(token: string, dto: PostDto, id: string, res: Response) {
+  async updatePost(dto: PostDto, id: string, res: Response) {
     this.logger.info("Начинаем обновление статьи.")
     try {
       this.logger.info("Создаем новую модельку статьи.")
@@ -261,7 +261,7 @@ export class PostService {
     }
   }
 
-  async deletePost(token: string, id: string, res: Response) {
+  async deletePost(id: string, res: Response) {
     this.logger.info("Начинаем удаление статьи.")
     try {
       this.logger.info("Ищем и удаляем статью.")
@@ -313,7 +313,7 @@ export class PostService {
         case "asc":
           return res.json(list.reverse())
         default:
-          res.json(list)
+          return res.json(list)
       }
     } catch (error) {
       this.logger.error("Не удалось получить список комментариев.")
