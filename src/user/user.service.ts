@@ -56,7 +56,7 @@ export class UserService {
 
   async updateUser(token: string, res: Response, dto: UpdateUserDto) {
     try {
-      this.logger.info("Начинаем смену аватара.")
+      this.logger.info("Начинаем смену данных пользователя.")
 
       this.logger.info("Расшифровываем токен.")
       const decoded = await this.jwtService.verify(
@@ -71,6 +71,8 @@ export class UserService {
         this.logger.error("Пользователь не найден.")
         throw new UnauthorizedException()
       }
+
+      console.log(dto.email, dto.username)
 
       if (dto.email) {
         if (dto.email === user.email) {
@@ -110,7 +112,7 @@ export class UserService {
 
   async changeAvatar(token: string, res: Response, file: Express.Multer.File) {
     try {
-      this.logger.info("Начинаем смену пароля.")
+      this.logger.info("Начинаем смену аватара.")
       if (!token) {
         this.logger.error("Не передан токен.")
         res.status(403).json({

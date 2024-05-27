@@ -94,6 +94,7 @@ export class AuthService {
         })
       }
 
+      this.logger.info("Валидация пароля.")
       const isValidPass = await bcrypt.compare(authDto.password, user.password)
 
       if (!isValidPass) {
@@ -103,22 +104,34 @@ export class AuthService {
         })
       }
 
+      this.logger.info("Генерация нового refresh-токена для пользователя.")
+      const refToken = await this.tokenGenerator.generateRefreshToken(user._id)
+
+      this.logger.info("Получение всех сессий пользователей.")
       const allSessions = await this.sessionModel.find()
 
+      if(!user.session) {
+        this.userModel.findOneAndUpdate({
+          _id: user._id
+        },
+        {
+          session: []
+        })
+      }
+
+      this.logger.info("Получение всех сессий пользователя.")
       const userSessions = allSessions.filter((oneSession) => {
         if (user.session.includes(oneSession._id)) {
           return oneSession
         }
       })
 
+      this.logger.info("Получение текущей сессии.")
       const curSession = userSessions.filter((userSession) => {
         if (userSession.userAgent.includes(ua)) {
           return userSession
         }
       })
-
-      this.logger.info("Генерация нового refresh-токена для пользователя.")
-      const refToken = await this.tokenGenerator.generateRefreshToken(user._id)
 
       if (curSession.length === 0) {
         this.logger.info("Создание новой сессии пользователя.")
