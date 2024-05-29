@@ -107,53 +107,6 @@ export class AuthService {
       this.logger.info("Генерация нового refresh-токена для пользователя.")
       const refToken = await this.tokenGenerator.generateRefreshToken(user._id)
 
-      this.logger.info("Получение всех сессий пользователей.")
-      const allSessions = await this.sessionModel.find()
-
-      if(!user.session) {
-        this.userModel.findOneAndUpdate({
-          _id: user._id
-        },
-        {
-          session: []
-        })
-      }
-
-      this.logger.info("Получение всех сессий пользователя.")
-      const userSessions = allSessions.filter((oneSession) => {
-        if (user.session.includes(oneSession._id)) {
-          return oneSession
-        }
-      })
-
-      this.logger.info("Получение текущей сессии.")
-      const curSession = userSessions.filter((userSession) => {
-        if (userSession.userAgent.includes(ua)) {
-          return userSession
-        }
-      })
-
-      if (curSession.length === 0) {
-        this.logger.info("Создание новой сессии пользователя.")
-        const newSession = new this.sessionModel({
-          refToken,
-          userAgent: ua,
-        })
-
-        await newSession.save()
-
-        user.session.push(newSession._id)
-      } else {
-        await this.sessionModel.findOneAndUpdate(
-          {
-            _id: curSession[0]._id,
-          },
-          {
-            refToken: refToken,
-          }
-        )
-      }
-
       const payload = {
         _id: user._id,
         name: user.username,
