@@ -13,7 +13,9 @@ import { AuthModule } from './auth/auth.module';
     PostModule,
     CommentModule,
     MongooseModule.forRoot(
-      "mongodb+srv://undersaga:Uq7123546E@mydb.zlgzmkd.mongodb.net/?retryWrites=true&w=majority&appName=mydb"
+      "mongodb+srv://undersaga:Uq7123546E@mydb.zlgzmkd.mongodb.net/?retryWrites=true&w=majority&appName=mydb", {
+        dbName: "workingDB"
+      }
     ),
     WinstonModule.forRoot({
       format: format.combine(format.timestamp(), format.prettyPrint()),

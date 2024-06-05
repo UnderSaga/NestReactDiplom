@@ -94,12 +94,6 @@ export class AuthService {
         })
       }
 
-      if(!user.session){
-        await user.updateOne({
-          session: []
-        })
-      }
-
       this.logger.info("Валидация пароля.")
       const isValidPass = await bcrypt.compare(authDto.password, user.password)
 
@@ -113,45 +107,14 @@ export class AuthService {
       this.logger.info("Генерация нового refresh-токена для пользователя.")
       const refToken = await this.tokenGenerator.generateRefreshToken(user._id)
 
-      this.logger.info("Получение всех сессий пользователей.")
-      const allSessions = await this.sessionModel.find()
-
-      this.logger.info("Получение всех сессий пользователя.")
-      const userSessions = allSessions.filter((oneSession) => {
-        if (user.session.includes(oneSession._id)) {
-          return oneSession
-        }
-
-        return null
+      this.logger.info("Создание новой сессии пользователя.")
+      const newSession = new this.sessionModel({
+        refToken,
+        userId: user._id,
+        userAgent: ua,
       })
 
-      this.logger.info("Получение текущей сессии.")
-      const curSession = userSessions.filter((userSession) => {
-        if (userSession.userAgent.includes(ua)) {
-          return userSession
-        }
-      })
-
-      if (curSession.length === 0) {
-        this.logger.info("Создание новой сессии пользователя.")
-        const newSession = new this.sessionModel({
-          refToken,
-          userAgent: ua,
-        })
-
-        await newSession.save()
-
-        user.session.push(newSession._id)
-      } else {
-        await this.sessionModel.findOneAndUpdate(
-          {
-            _id: curSession[0]._id,
-          },
-          {
-            refToken: refToken,
-          }
-        )
-      }
+      await newSession.save()
 
       const payload = {
         _id: user._id,
@@ -161,8 +124,6 @@ export class AuthService {
 
       this.logger.info("Генерация нового токена для пользователя.")
       const accessToken = await this.tokenGenerator.generateAccessToken(payload)
-
-      await user.save()
 
       this.logger.info("Пользователь авторизован.")
       res.json({ accessToken, refToken })
@@ -236,27 +197,13 @@ export class AuthService {
         throw new UnauthorizedException("Рефреш-токен не является подлиным.")
       }
 
-      this.logger.info("Получение пользователя из рефреш-токена.")
-      const { _id } = this.jwtService.decode(refToken)
-      const user = await this.userModel.findById(_id)
-
+      this.logger.info("Поиск сессии в базе данных.")
       const session = await this.sessionModel.findOne({
         refToken
       })
 
-      const userSessions = user.session
-      const newSessions = userSessions.filter(n => n != session._id)
-
-      this.logger.info("Убираем поле сессии у пользователя.")
-      await user.updateOne({
-        session: newSessions
-      })
       this.logger.info("Удаляем сессию из БД.")
       await session.deleteOne()
-
-      
-      this.logger.info("Сохраняем изменения пользователя.")
-      await user.save()
 
       res.json({
         message: "Вы успешно вышли из аккаунта",
