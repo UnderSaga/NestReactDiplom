@@ -94,6 +94,12 @@ export class AuthService {
         })
       }
 
+      if(!user.session){
+        await user.updateOne({
+          session: []
+        })
+      }
+
       this.logger.info("Валидация пароля.")
       const isValidPass = await bcrypt.compare(authDto.password, user.password)
 
@@ -110,20 +116,13 @@ export class AuthService {
       this.logger.info("Получение всех сессий пользователей.")
       const allSessions = await this.sessionModel.find()
 
-      if(!user.session) {
-        this.userModel.findOneAndUpdate({
-          _id: user._id
-        },
-        {
-          session: []
-        })
-      }
-
       this.logger.info("Получение всех сессий пользователя.")
       const userSessions = allSessions.filter((oneSession) => {
         if (user.session.includes(oneSession._id)) {
           return oneSession
         }
+
+        return null
       })
 
       this.logger.info("Получение текущей сессии.")
@@ -241,8 +240,22 @@ export class AuthService {
       const { _id } = this.jwtService.decode(refToken)
       const user = await this.userModel.findById(_id)
 
-      user.session = null
+      const session = await this.sessionModel.findOne({
+        refToken
+      })
 
+      const userSessions = user.session
+      const newSessions = userSessions.filter(n => n != session._id)
+
+      this.logger.info("Убираем поле сессии у пользователя.")
+      await user.updateOne({
+        session: newSessions
+      })
+      this.logger.info("Удаляем сессию из БД.")
+      await session.deleteOne()
+
+      
+      this.logger.info("Сохраняем изменения пользователя.")
       await user.save()
 
       res.json({
