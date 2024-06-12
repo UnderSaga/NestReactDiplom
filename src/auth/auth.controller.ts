@@ -7,6 +7,7 @@ import {
   UsePipes,
   ValidationPipe,
   Headers,
+  Delete,
 } from "@nestjs/common"
 import { AuthService } from "./auth.service"
 import {
@@ -78,7 +79,7 @@ export class AuthController {
     return this.authService.refresh(ua, token, res)
   }
 
-  @Patch("logout")
+  @Delete("logout")
   async logout(@Body("refresh") token: string, @Res() res: Response) {
     return this.authService.logout(token, res)
   }
