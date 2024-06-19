@@ -33,8 +33,9 @@ export class AuthController {
     description: "Не удалось создать пользователя.",
   })
   @UsePipes(new ValidationPipe())
-  async registration(@Body() dto: AuthDto, @Res() res: Response) {
-    return this.authService.registration(dto, res)
+  async registration(
+    @Headers("user-agent") ua: string, @Body() dto: AuthDto, @Res() res: Response) {
+    return this.authService.registration(ua, dto, res)
   }
 
   @Post("login")

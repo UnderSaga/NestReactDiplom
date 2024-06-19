@@ -26,7 +26,7 @@ export class AuthService {
     @InjectModel(Session.name) private sessionModel: Model<Session>
   ) {}
 
-  async registration(authDto: AuthDto, res: Response) {
+  async registration(ua: string, authDto: AuthDto, res: Response) {
     try {
       this.logger.info("Начало создания пользователя.")
       const { username, email, password } = authDto
@@ -44,8 +44,7 @@ export class AuthService {
         email,
         username,
         password: hash,
-        roles: [userRole.value],
-        session: "",
+        roles: [userRole.value]
       })
 
       const payload = {
@@ -60,9 +59,11 @@ export class AuthService {
       this.logger.info("Создание refresh-токена для пользователя.")
       const refToken = await this.tokenGenerator.generateRefreshToken(user._id)
 
+      this.logger.info("Создание первой сессии пользователя.")
       const newSession = new this.sessionModel({
         refToken,
-        userAgent: "",
+        userId: user._id,
+        userAgent: ua,
       })
 
       await newSession.save()
