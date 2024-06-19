@@ -163,21 +163,4 @@ export class UserService {
       })
     }
   }
-
-  async getNameByID(id: string, res: Response) {
-    this.logger.info("Получаем изображение.")
-    try {
-      this.logger.info("Ищем пользователя в базе данных.")
-      const user = await this.userModel.findOne({
-        _id: id,
-      })
-
-      res.json({name: user.username})
-    } catch (error) {
-      this.logger.info("Не удалось получить имя пользователя.")
-      res.status(500).json({
-        error: "Не удалось получть пользователя.",
-      })
-    }
-  }
 }

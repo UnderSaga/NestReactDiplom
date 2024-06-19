@@ -82,9 +82,4 @@ export class UserController {
   async getAvatar(@Param("imagename") image: string, @Res() res: Response) {
     return this.userService.getAvatar(image, res)
   }
-
-  @Get("name/:userID")
-  async getNameByID(@Param("userID") id: string, @Res() res: Response) {
-    return this.userService.getNameByID(id, res)
-  }
 }
