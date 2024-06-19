@@ -18,6 +18,11 @@ export class Comment {
   @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: "User" } })
   author: mongoose.Schema.Types.ObjectId
 
+  @Prop({
+    required: true,
+  })
+  authorName: string
+
   @Prop({ required: true, default: false })
   changed: boolean
 

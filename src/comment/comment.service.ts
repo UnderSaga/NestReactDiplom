@@ -34,11 +34,14 @@ export class CommentService {
         token.replace(/Bearer\s?/, "")
       )
 
+      console.log(decoded)
+
       this.logger.info("Создаем модельку комментария.")
       const newComment = new this.commentModel({
         postId,
         comment,
         author: decoded._id,
+        authorName: decoded.name,
         changed: false,
       })
 
