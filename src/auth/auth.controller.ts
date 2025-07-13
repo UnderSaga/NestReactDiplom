@@ -8,17 +8,17 @@ import {
   ValidationPipe,
   Headers,
   Delete,
-} from "@nestjs/common"
-import { AuthService } from "./auth.service"
+} from "@nestjs/common";
+import { AuthService } from "./auth.service";
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiTags,
-} from "@nestjs/swagger"
-import { AuthDto } from "./auth.dto"
-import { Response } from "express"
+} from "@nestjs/swagger";
+import { AuthDto } from "./auth.dto";
+import { Response } from "express";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -34,8 +34,11 @@ export class AuthController {
   })
   @UsePipes(new ValidationPipe())
   async registration(
-    @Headers("user-agent") ua: string, @Body() dto: AuthDto, @Res() res: Response) {
-    return this.authService.registration(ua, dto, res)
+    @Headers("user-agent") ua: string,
+    @Body() dto: AuthDto,
+    @Res() res: Response,
+  ) {
+    return this.authService.registration(ua, dto, res);
   }
 
   @Post("login")
@@ -54,9 +57,9 @@ export class AuthController {
   async login(
     @Headers("user-agent") ua: string,
     @Body() dto: AuthDto,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return this.authService.login(ua, dto, res)
+    return this.authService.login(ua, dto, res);
   }
 
   @Patch("refresh")
@@ -75,13 +78,13 @@ export class AuthController {
   async refresh(
     @Headers("user-agent") ua: string,
     @Body("refresh") token: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return this.authService.refresh(ua, token, res)
+    return this.authService.refresh(ua, token, res);
   }
 
   @Delete("logout")
   async logout(@Body("refresh") token: string, @Res() res: Response) {
-    return this.authService.logout(token, res)
+    return this.authService.logout(token, res);
   }
 }

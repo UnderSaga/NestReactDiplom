@@ -1,8 +1,8 @@
-import { Module } from "@nestjs/common"
-import { AuthService } from "./auth.service"
-import { AuthController } from "./auth.controller"
-import { ConfigModule } from "@nestjs/config"
-import { MongooseModule } from "@nestjs/mongoose"
+import { Module } from "@nestjs/common";
+import { AuthService } from "./auth.service";
+import { AuthController } from "./auth.controller";
+import { ConfigModule } from "@nestjs/config";
+import { MongooseModule } from "@nestjs/mongoose";
 import {
   User,
   UserSchema,
@@ -10,9 +10,9 @@ import {
   RoleSchema,
   Session,
   SessionSchema,
-} from "src/schemas/index.schema"
-import { JwtModule } from "@nestjs/jwt"
-import { TokenGenerator } from "src/utils/tokenGenerator.utils"
+} from "src/schemas/index.schema";
+import { JwtModule } from "@nestjs/jwt";
+import { TokenGenerator } from "src/utils/tokenGenerator.utils";
 
 @Module({
   imports: [

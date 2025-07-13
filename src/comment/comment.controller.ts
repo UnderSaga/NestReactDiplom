@@ -11,18 +11,18 @@ import {
   Headers,
   Get,
   UseGuards,
-} from "@nestjs/common"
-import { CommentService } from "./comment.service"
-import { CommentDto } from "./comment.dto"
-import { Response } from "express"
+} from "@nestjs/common";
+import { CommentService } from "./comment.service";
+import { CommentDto } from "./comment.dto";
+import { Response } from "express";
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiTags,
-} from "@nestjs/swagger"
-import { IsAuthGuard, CommentGuard } from "src/guards/index.guards"
+} from "@nestjs/swagger";
+import { IsAuthGuard, CommentGuard } from "src/guards/index.guards";
 
 @Controller("comments")
 @ApiTags("Comment")
@@ -47,9 +47,9 @@ export class CommentController {
   async createComment(
     @Headers("authorization") token: string,
     @Body() dto: CommentDto,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return this.commentService.create(token, dto, res)
+    return this.commentService.create(token, dto, res);
   }
 
   @Patch(":id")
@@ -67,9 +67,9 @@ export class CommentController {
     @Headers("authorization") token: string,
     @Param("id") id: string,
     @Body() dto: CommentDto,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return this.commentService.update(id, dto, res)
+    return this.commentService.update(id, dto, res);
   }
 
   @Delete(":id")
@@ -86,9 +86,9 @@ export class CommentController {
   async deleteComment(
     @Headers("authorization") token: string,
     @Param("id") id: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return this.commentService.delete(id, res)
+    return this.commentService.delete(id, res);
   }
 
   @Patch(":id/likes")
@@ -105,8 +105,8 @@ export class CommentController {
   async likeComment(
     @Headers("authorization") token: string,
     @Param("id") id: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return this.commentService.likeComment(token, id, res)
+    return this.commentService.likeComment(token, id, res);
   }
 }

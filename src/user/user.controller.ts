@@ -10,19 +10,19 @@ import {
   UseInterceptors,
   Param,
   UseGuards,
-} from "@nestjs/common"
-import { UserService } from "./user.service"
-import { Response } from "express"
+} from "@nestjs/common";
+import { UserService } from "./user.service";
+import { Response } from "express";
 import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiTags,
-} from "@nestjs/swagger"
-import { UpdateUserDto } from "./updateUser.dto"
-import { FileInterceptor } from "@nestjs/platform-express"
-import { diskStorage } from "multer"
-import { IsAuthGuard } from "../guards/index.guards"
+} from "@nestjs/swagger";
+import { UpdateUserDto } from "./updateUser.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { IsAuthGuard } from "../guards/index.guards";
 
 @Controller("user")
 @ApiTags("User")
@@ -41,7 +41,7 @@ export class UserController {
     description: "Не удалось получить данные пользователя.",
   })
   async getMe(@Headers("authorization") token: string, @Res() res: Response) {
-    return this.userService.getMe(token, res)
+    return this.userService.getMe(token, res);
   }
 
   @Patch("newUserData")
@@ -49,9 +49,9 @@ export class UserController {
   async updateUser(
     @Headers("authorization") token: string,
     @Res() res: Response,
-    @Body() dto: UpdateUserDto
+    @Body() dto: UpdateUserDto,
   ) {
-    return this.userService.updateUser(token, res, dto)
+    return this.userService.updateUser(token, res, dto);
   }
 
   @Post("avatar")
@@ -61,25 +61,25 @@ export class UserController {
       storage: diskStorage({
         destination: "./uploads/avatars",
         filename: (_, file, cb) => {
-          const extIndex = file.originalname.lastIndexOf(".")
+          const extIndex = file.originalname.lastIndexOf(".");
           cb(
             null,
-            `${file.originalname.slice(0, extIndex)}${Date.now()}${file.originalname.slice(extIndex)}`
-          )
+            `${file.originalname.slice(0, extIndex)}${Date.now()}${file.originalname.slice(extIndex)}`,
+          );
         },
       }),
-    })
+    }),
   )
   async changeAvatar(
     @Headers("authorization") token: string,
     @Res() res: Response,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.userService.changeAvatar(token, res, file)
+    return this.userService.changeAvatar(token, res, file);
   }
 
   @Get("avatar/:imagename")
   async getAvatar(@Param("imagename") image: string, @Res() res: Response) {
-    return this.userService.getAvatar(image, res)
+    return this.userService.getAvatar(image, res);
   }
 }

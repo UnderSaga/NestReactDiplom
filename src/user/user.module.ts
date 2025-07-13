@@ -1,10 +1,10 @@
-import { Module } from "@nestjs/common"
-import { UserService } from "./user.service"
-import { UserController } from "./user.controller"
-import { MongooseModule } from "@nestjs/mongoose"
-import { User, UserSchema, Role, RoleSchema } from "src/schemas/index.schema"
-import { JwtModule } from "@nestjs/jwt"
-import { ConfigModule } from "@nestjs/config"
+import { Module } from "@nestjs/common";
+import { UserService } from "./user.service";
+import { UserController } from "./user.controller";
+import { MongooseModule } from "@nestjs/mongoose";
+import { User, UserSchema, Role, RoleSchema } from "src/schemas/index.schema";
+import { JwtModule } from "@nestjs/jwt";
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
   imports: [

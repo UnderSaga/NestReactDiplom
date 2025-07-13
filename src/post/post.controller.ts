@@ -12,10 +12,10 @@ import {
   Headers,
   Query,
   UseGuards,
-} from "@nestjs/common"
-import { PostService } from "./post.service"
-import { PostDto } from "./post.dto"
-import { Response } from "express"
+} from "@nestjs/common";
+import { PostService } from "./post.service";
+import { PostDto } from "./post.dto";
+import { Response } from "express";
 import {
   ApiAcceptedResponse,
   ApiCreatedResponse,
@@ -23,8 +23,8 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiTags,
-} from "@nestjs/swagger"
-import { HasRoleGuard, IsAuthGuard } from "../guards/index.guards"
+} from "@nestjs/swagger";
+import { HasRoleGuard, IsAuthGuard } from "../guards/index.guards";
 
 @Controller("posts")
 @ApiTags("Post")
@@ -44,7 +44,7 @@ export class PostController {
   })
   @UsePipes(new ValidationPipe())
   async createPost(@Body() dto: PostDto, @Res() res: Response) {
-    return this.postService.create(dto, res)
+    return this.postService.create(dto, res);
   }
 
   @Get("?")
@@ -58,9 +58,9 @@ export class PostController {
     @Res() res: Response,
     @Query("tag") tag?: string,
     @Query("name") name?: string,
-    @Query("body") body?: string
+    @Query("body") body?: string,
   ) {
-    return this.postService.getAll(res, tag, name, body)
+    return this.postService.getAll(res, tag, name, body);
   }
 
   @Get("latest")
@@ -72,9 +72,9 @@ export class PostController {
   })
   async getLiked(
     @Res() res: Response,
-    @Headers("authorization") token: string
+    @Headers("authorization") token: string,
   ) {
-    return this.postService.getLatestLiked(res, token)
+    return this.postService.getLatestLiked(res, token);
   }
 
   @Get(":id")
@@ -85,7 +85,7 @@ export class PostController {
     description: "Не удалось получить статью.",
   })
   async getOne(@Param("id") id: string, @Res() res: Response) {
-    return this.postService.getOne(id, res)
+    return this.postService.getOne(id, res);
   }
 
   @Patch(":id/like")
@@ -99,9 +99,9 @@ export class PostController {
   async likePost(
     @Param("id") id: string,
     @Res() res: Response,
-    @Headers("authorization") token: string
+    @Headers("authorization") token: string,
   ) {
-    return this.postService.likePost(id, res, token)
+    return this.postService.likePost(id, res, token);
   }
 
   @Patch(":id")
@@ -121,9 +121,9 @@ export class PostController {
   async updatePost(
     @Body() dto: PostDto,
     @Param("id") id: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
-    return this.postService.updatePost(dto, id, res)
+    return this.postService.updatePost(dto, id, res);
   }
 
   @Delete(":id")
@@ -141,7 +141,7 @@ export class PostController {
     description: "Не удалось удалить статью.",
   })
   async deletePost(@Param("id") id: string, @Res() res: Response) {
-    return this.postService.deletePost(id, res)
+    return this.postService.deletePost(id, res);
   }
 
   @Get("comments/:id?")
@@ -157,8 +157,8 @@ export class PostController {
   async getComments(
     @Param("id") id: string,
     @Res() res: Response,
-    @Query("sort") sort?: string
+    @Query("sort") sort?: string,
   ) {
-    return this.postService.getComments(sort, id, res)
+    return this.postService.getComments(sort, id, res);
   }
 }

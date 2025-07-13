@@ -1,17 +1,17 @@
-import { Length } from "class-validator"
-import { ApiProperty } from "@nestjs/swagger"
+import { Length } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
 
 export class PostDto {
   @Length(5)
   @ApiProperty({ example: "Топовая статья." })
-  header: string
+  header: string;
 
   @Length(5)
   @ApiProperty({ example: "Тело топовой статьи." })
-  body: string
+  body: string;
 
   @ApiProperty({ example: ["1 тег", "2 тег"] })
-  tags: string[]
+  tags: string[];
 
-  imageUrl: string
+  imageUrl: string;
 }

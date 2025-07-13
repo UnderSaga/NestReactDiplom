@@ -1,22 +1,22 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
-import mongoose, { HydratedDocument } from "mongoose"
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import mongoose, { HydratedDocument } from "mongoose";
 
-export type SessionDocument = HydratedDocument<Session>
+export type SessionDocument = HydratedDocument<Session>;
 
 @Schema()
 export class Session {
   @Prop({ required: true })
-  refToken: string
+  refToken: string;
 
   @Prop({ required: true })
-  @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: "User" }})
-  userId: mongoose.Schema.Types.ObjectId
+  @Prop({ type: { type: mongoose.Schema.Types.ObjectId, ref: "User" } })
+  userId: mongoose.Schema.Types.ObjectId;
 
   @Prop()
-  userAgent: string
+  userAgent: string;
 
   @Prop({ default: Date.now() })
-  createdAt: Date
+  createdAt: Date;
 }
 
-export const SessionSchema = SchemaFactory.createForClass(Session)
+export const SessionSchema = SchemaFactory.createForClass(Session);

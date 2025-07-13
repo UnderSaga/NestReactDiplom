@@ -1,7 +1,7 @@
-import { JwtService } from "@nestjs/jwt"
-import jwt from "jsonwebtoken"
-import { randomBytes } from "crypto"
-import { InternalServerErrorException } from "@nestjs/common"
+import { JwtService } from "@nestjs/jwt";
+import jwt from "jsonwebtoken";
+import { randomBytes } from "crypto";
+import { InternalServerErrorException } from "@nestjs/common";
 
 export class TokenGenerator {
   constructor(private jwtService: JwtService) {}
@@ -10,13 +10,13 @@ export class TokenGenerator {
     this.jwtService = new JwtService({
       secret: process.env.SECRET,
       signOptions: { expiresIn: "1d" },
-    })
+    });
     try {
-      const accessToken = this.jwtService.sign(payload)
+      const accessToken = this.jwtService.sign(payload);
 
-      return accessToken
+      return accessToken;
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
 
@@ -24,17 +24,17 @@ export class TokenGenerator {
     this.jwtService = new JwtService({
       secret: process.env.SECRET,
       signOptions: { expiresIn: "30d" },
-    })
+    });
     try {
-      const hash = randomBytes(8)
+      const hash = randomBytes(8);
       const refreshToken = this.jwtService.sign({
         code: hash.toString(),
         _id,
-      })
+      });
 
-      return refreshToken
+      return refreshToken;
     } catch (error) {
-      throw new InternalServerErrorException(error)
+      throw new InternalServerErrorException(error);
     }
   }
 }
