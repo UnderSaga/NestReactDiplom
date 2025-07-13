@@ -33,14 +33,13 @@ export class PostService {
         imageUrl: postDto.imageUrl,
       });
 
-      const postTypes = await this.postTypeModel.find()
-      let typesArr = []
-      for(let i = 0; i < postTypes.length; i++){
-        typesArr.push(postTypes[i].type)
-      }
-      if(!typesArr.includes(doc.type)) {
-        this.logger.info("Тип статьи должен соответствовать существующим")
-        throw Error
+      const postTypes = await this.postTypeModel.findOne({type: doc.type})
+      if(!postTypes) {
+        this.logger.info("Тип статьи должен соответствовать существующим.")
+        return res.status(400).json({
+        message:
+          "Тип статьи должен соответствовать существующим.",
+      });
       }
 
       this.logger.info("Сохраняем статью в базу данных.");
@@ -57,10 +56,10 @@ export class PostService {
     }
   }
 
-  async getAll(res: Response, tagReq?: string, name?: string, body?: string) {
+  async getPosts(res: Response, type: string, tagReq?: string, name?: string, body?: string) {
     try {
       this.logger.info("Начинаем получение статей.");
-      let posts = await this.postModel.find();
+      let posts = await this.postModel.find({type});
 
       if (tagReq) {
         this.logger.info("Сортируем статьи по тегу.");

@@ -54,13 +54,14 @@ export class PostController {
   @ApiInternalServerErrorResponse({
     description: "Не удалось получить список статей.",
   })
-  async getAll(
+  async getPosts(
     @Res() res: Response,
+    @Query("type") type: string,
     @Query("tag") tag?: string,
     @Query("name") name?: string,
     @Query("body") body?: string,
   ) {
-    return this.postService.getAll(res, tag, name, body);
+    return this.postService.getPosts(res, type, tag, name, body);
   }
 
   @Get("latest")
