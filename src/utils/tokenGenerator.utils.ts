@@ -1,5 +1,4 @@
 import { JwtService } from "@nestjs/jwt";
-import jwt from "jsonwebtoken";
 import { randomBytes } from "crypto";
 import { InternalServerErrorException } from "@nestjs/common";
 

@@ -8,11 +8,13 @@ import {
   Comment,
   CommentSchema,
 } from "src/schemas/index.schema";
+import { PostType, PostTypeSchema } from "src/schemas/posttype.shema";
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Comment.name, schema: CommentSchema },
+      { name: PostType.name, schema: PostTypeSchema},
       { name: Post.name, schema: PostSchema },
     ]),
   ],

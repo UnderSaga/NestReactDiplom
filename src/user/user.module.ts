@@ -5,6 +5,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema, Role, RoleSchema } from "src/schemas/index.schema";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule } from "@nestjs/config";
+import { PostType, PostTypeSchema } from "src/schemas/posttype.shema";
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { ConfigModule } from "@nestjs/config";
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Role.name, schema: RoleSchema },
+      { name: PostType.name, schema: PostTypeSchema },
     ]),
     JwtModule.register({
       global: true,

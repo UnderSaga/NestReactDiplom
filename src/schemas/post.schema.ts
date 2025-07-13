@@ -11,6 +11,9 @@ export class Post {
   @Prop({ required: true })
   body: string;
 
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "postType" }] })
+  type: string;
+
   @Prop({ required: false })
   tags: string[];
 

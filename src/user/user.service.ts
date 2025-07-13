@@ -7,11 +7,13 @@ import { Response } from "express";
 import { Logger } from "winston";
 import { UpdateUserDto } from "./updateUser.dto";
 import { join } from "path";
+import { PostType } from "src/schemas/posttype.shema";
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(PostType.name) private postTypeModel: Model<PostType>,
     private jwtService: JwtService,
     @Inject("winston")
     private readonly logger: Logger,

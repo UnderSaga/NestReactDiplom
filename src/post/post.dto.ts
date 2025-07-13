@@ -10,6 +10,8 @@ export class PostDto {
   @ApiProperty({ example: "Тело топовой статьи." })
   body: string;
 
+  type: string;
+
   @ApiProperty({ example: ["1 тег", "2 тег"] })
   tags: string[];
 

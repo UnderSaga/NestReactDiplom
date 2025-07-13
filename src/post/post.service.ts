@@ -6,12 +6,15 @@ import { Post, Comment } from "src/schemas/index.schema";
 import { Response } from "express";
 import { JwtService } from "@nestjs/jwt";
 import { Logger } from "winston";
+import { PostType } from "src/schemas/posttype.shema";
+import { error } from "console";
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectModel(Post.name) private postModel: Model<Post>,
     @InjectModel(Comment.name) private commentModel: Model<Comment>,
+    @InjectModel(PostType.name) private postTypeModel: Model<PostType>,
     private jwtService: JwtService,
     @Inject("winston")
     private readonly logger: Logger,
@@ -25,9 +28,20 @@ export class PostService {
       const doc = new this.postModel({
         header: postDto.header,
         body: postDto.body,
+        type: postDto.type,
         tags: postDto.tags,
         imageUrl: postDto.imageUrl,
       });
+
+      const postTypes = await this.postTypeModel.find()
+      let typesArr = []
+      for(let i = 0; i < postTypes.length; i++){
+        typesArr.push(postTypes[i].type)
+      }
+      if(!typesArr.includes(doc.type)) {
+        this.logger.info("Тип статьи должен соответствовать существующим")
+        throw Error
+      }
 
       this.logger.info("Сохраняем статью в базу данных.");
       await doc.save();
